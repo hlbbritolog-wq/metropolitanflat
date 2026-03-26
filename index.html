@@ -1,15 +1,1321 @@
-# Crie uma pasta e entre nela
-mkdir metropolitan-flat && cd metropolitan-flat
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Metropolitan Flat</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0a0a0f;--bg2:#111118;--bg3:#16161f;--bg4:#1c1c28;
+  --glass:rgba(255,255,255,0.04);--glass2:rgba(255,255,255,0.07);
+  --border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.14);
+  --text:#f0f0f8;--text2:#9090a8;--text3:#50505e;
+  --accent:#7c6af7;--accent2:#a594ff;--accent-glow:rgba(124,106,247,0.25);
+  --teal:#2dd4b0;--teal-dim:rgba(45,212,176,0.15);
+  --coral:#f87171;--coral-dim:rgba(248,113,113,0.15);
+  --gold:#fbbf24;--gold-dim:rgba(251,191,36,0.15);
+  --blue:#60a5fa;--blue-dim:rgba(96,165,250,0.15);
+  --green:#4ade80;--green-dim:rgba(74,222,128,0.15);
+  --r:14px;--r-sm:8px;--r-lg:20px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
+::selection{background:var(--accent);color:#fff;}
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:4px;}
+.app{display:flex;min-height:100vh;}
+.sidebar{width:220px;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;height:100vh;z-index:100;}
+.main{margin-left:220px;flex:1;padding:2rem 2.5rem;min-height:100vh;}
+.logo{padding:1.75rem 1.5rem 1.25rem;border-bottom:1px solid var(--border);}
+.logo-row{display:flex;align-items:center;gap:10px;margin-bottom:4px;}
+.logo-ico{width:32px;height:32px;background:linear-gradient(135deg,var(--accent),var(--teal));border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:1rem;box-shadow:0 0 20px var(--accent-glow);}
+.logo h1{font-family:'Syne',sans-serif;font-size:1.15rem;font-weight:800;letter-spacing:-.02em;background:linear-gradient(135deg,#fff 40%,var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.logo-sub{font-size:.68rem;color:var(--text3);letter-spacing:.1em;text-transform:uppercase;margin-left:42px;}
+.nav{padding:1rem .75rem;flex:1;display:flex;flex-direction:column;gap:2px;}
+.nav-sec{font-size:.63rem;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);padding:.75rem .75rem .25rem;font-weight:600;}
+.ni{display:flex;align-items:center;gap:10px;padding:.6rem .75rem;color:var(--text2);font-size:.8rem;font-weight:500;cursor:pointer;border-radius:var(--r-sm);transition:all .2s;}
+.ni:hover{color:var(--text);background:var(--glass);}
+.ni.active{color:#fff;background:linear-gradient(135deg,rgba(124,106,247,.2),rgba(45,212,176,.1));border:1px solid rgba(124,106,247,.3);}
+.ni.active .ni-ico{background:var(--accent);color:#fff;box-shadow:0 0 12px var(--accent-glow);}
+.ni-ico{width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;background:var(--bg4);font-size:.75rem;transition:all .2s;flex-shrink:0;}
+.ni-badge{margin-left:auto;background:var(--accent);color:#fff;font-size:.65rem;font-weight:700;padding:1px 6px;border-radius:10px;box-shadow:0 0 8px var(--accent-glow);}
+.sidebar-bot{padding:1rem .75rem;border-top:1px solid var(--border);}
+.clock-pill{background:var(--glass);border:1px solid var(--border);border-radius:20px;padding:.4rem .75rem;font-size:.78rem;font-weight:600;color:var(--text2);text-align:center;font-family:'Syne',sans-serif;letter-spacing:.05em;}
+/* SYNC INDICATOR */
+.sync-dot{width:7px;height:7px;border-radius:50%;background:var(--text3);display:inline-block;margin-right:5px;transition:background .3s;}
+.sync-dot.syncing{background:var(--gold);animation:blink 1s infinite;}
+.sync-dot.ok{background:var(--green);}
+.sync-dot.err{background:var(--coral);}
+.sync-label{font-size:.65rem;color:var(--text3);}
+/* LOADING OVERLAY */
+.loading-overlay{position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem;}
+.loading-overlay.hidden{display:none;}
+.spinner{width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-txt{font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;color:var(--text2);}
+/* PAGES */
+.page{display:none;animation:fadeUp .35s ease;}
+.page.active{display:block;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.ph{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:2rem;}
+.pt{font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;letter-spacing:-.03em;color:#fff;}
+.ps{font-size:.825rem;color:var(--text3);margin-top:4px;}
+.btn{display:inline-flex;align-items:center;gap:7px;padding:.6rem 1.25rem;border-radius:var(--r-sm);font-size:.825rem;font-weight:600;cursor:pointer;border:none;transition:all .2s;font-family:'Inter',sans-serif;}
+.btn-p{background:linear-gradient(135deg,var(--accent),#6356e8);color:#fff;box-shadow:0 4px 16px var(--accent-glow);}
+.btn-p:hover{transform:translateY(-1px);box-shadow:0 8px 28px var(--accent-glow);}
+.btn-g{background:var(--glass2);border:1px solid var(--border2);color:var(--text2);}
+.btn-g:hover{color:#fff;border-color:rgba(255,255,255,.25);}
+.btn-t{background:linear-gradient(135deg,#1faa8f,var(--teal));color:#0a2e28;font-weight:700;}
+.btn-t:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(45,212,176,.3);}
+.btn-d{background:var(--coral-dim);border:1px solid rgba(248,113,113,.3);color:var(--coral);}
+.btn-d:hover{background:rgba(248,113,113,.2);}
+.btn-sm{padding:.35rem .85rem;font-size:.75rem;}
+.ibtn{width:32px;height:32px;border-radius:var(--r-sm);background:var(--glass);border:1px solid var(--border);color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.85rem;transition:all .2s;}
+.ibtn:hover{background:var(--glass2);border-color:var(--border2);color:#fff;}
+.card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:1.5rem;}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1.75rem;}
+.sc{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:1.25rem 1.5rem;position:relative;overflow:hidden;transition:border-color .2s;}
+.sc:hover{border-color:var(--border2);}
+.sc-glow{position:absolute;top:-20px;right:-20px;width:80px;height:80px;border-radius:50%;filter:blur(30px);opacity:.6;}
+.sc-lbl{font-size:.7rem;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);font-weight:600;margin-bottom:.6rem;}
+.sc-val{font-family:'Syne',sans-serif;font-size:2.2rem;font-weight:800;letter-spacing:-.04em;line-height:1;}
+.sc-meta{font-size:.75rem;color:var(--text3);margin-top:6px;}
+.sc-ico{position:absolute;bottom:1rem;right:1rem;font-size:1.5rem;opacity:.15;}
+.badge{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:.7rem;font-weight:600;}
+.bdot{width:5px;height:5px;border-radius:50%;flex-shrink:0;}
+.b-conf{background:var(--blue-dim);color:var(--blue);border:1px solid rgba(96,165,250,.2);}
+.b-act{background:var(--green-dim);color:var(--green);border:1px solid rgba(74,222,128,.2);}
+.b-act .bdot{background:var(--green);animation:blink 2s infinite;}
+.b-fin{background:var(--glass);color:var(--text3);border:1px solid var(--border);}
+.b-out{background:var(--coral-dim);color:var(--coral);border:1px solid rgba(248,113,113,.2);}
+.alert-bar{background:linear-gradient(135deg,rgba(251,191,36,.12),rgba(251,191,36,.06));border:1px solid rgba(251,191,36,.25);border-radius:var(--r);padding:.875rem 1.25rem;margin-bottom:1.5rem;display:flex;align-items:center;gap:10px;font-size:.825rem;}
+.alert-bar strong{color:var(--gold);}
+.adis{margin-left:auto;background:none;border:none;cursor:pointer;color:var(--text3);font-size:1.1rem;padding:2px 6px;border-radius:4px;transition:all .15s;}
+.adis:hover{color:#fff;background:var(--glass);}
+.toolbar{display:flex;gap:.75rem;align-items:center;margin-bottom:1.25rem;flex-wrap:wrap;}
+.sw{flex:1;min-width:200px;position:relative;}
+.sw input{width:100%;padding-left:2.25rem;}
+.si{position:absolute;left:.75rem;top:50%;transform:translateY(-50%);color:var(--text3);font-size:.85rem;pointer-events:none;}
+input,select,textarea{background:var(--bg4);border:1px solid var(--border);border-radius:var(--r-sm);color:var(--text);font-family:'Inter',sans-serif;font-size:.825rem;padding:.6rem .85rem;transition:border-color .2s,box-shadow .2s;outline:none;}
+input:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-glow);}
+input::placeholder{color:var(--text3);}
+select option{background:var(--bg4);}
+label{font-size:.75rem;font-weight:600;color:var(--text2);letter-spacing:.02em;}
+.mo{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(6px);z-index:1000;align-items:center;justify-content:center;padding:1rem;}
+.mo.open{display:flex;}
+.modal{background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r-lg);width:100%;max-width:560px;max-height:90vh;overflow-y:auto;box-shadow:0 24px 80px rgba(0,0,0,.6);}
+.mh{padding:1.75rem 1.75rem 1.25rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.mt{font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800;letter-spacing:-.02em;}
+.mb{padding:1.5rem 1.75rem;}
+.mf{padding:1.25rem 1.75rem;border-top:1px solid var(--border);display:flex;gap:.75rem;justify-content:flex-end;}
+.cx{background:var(--glass);border:1px solid var(--border);color:var(--text2);width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;transition:all .2s;}
+.cx:hover{background:var(--glass2);color:#fff;}
+.fg-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+.fg{display:flex;flex-direction:column;gap:5px;}
+.fg.full{grid-column:1/-1;}
+.ferr{font-size:.7rem;color:var(--coral);}
+.dp{display:none;background:rgba(124,106,247,.12);border:1px solid rgba(124,106,247,.25);color:var(--accent2);padding:6px 12px;border-radius:8px;font-size:.8rem;font-weight:600;margin-top:4px;}
+table{width:100%;border-collapse:collapse;font-size:.825rem;}
+thead tr{border-bottom:1px solid var(--border);}
+th{text-align:left;padding:.75rem 1rem;font-size:.68rem;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);font-weight:600;white-space:nowrap;}
+td{padding:.9rem 1rem;border-bottom:1px solid rgba(255,255,255,.04);vertical-align:middle;}
+tbody tr:last-child td{border-bottom:none;}
+tbody tr{transition:background .15s;}
+tbody tr:hover{background:var(--glass);}
+tbody tr.rout{background:rgba(248,113,113,.04);}
+tbody tr.ract{background:rgba(74,222,128,.03);}
+.gn{font-weight:600;color:#fff;}
+.gp{font-size:.75rem;color:var(--text3);margin-top:2px;}
+.ac{background:rgba(124,106,247,.15);color:var(--accent2);border:1px solid rgba(124,106,247,.2);padding:3px 10px;border-radius:6px;font-size:.75rem;font-weight:600;}
+.acts{display:flex;gap:5px;}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;}
+.cdl{text-align:center;font-size:.65rem;font-weight:700;color:var(--text3);text-transform:uppercase;padding:6px 0;letter-spacing:.08em;}
+.cc{min-height:82px;background:var(--bg4);border:1px solid var(--border);border-radius:10px;padding:5px;transition:border-color .15s;}
+.cc:hover{border-color:var(--border2);}
+.cc.other{opacity:.3;}
+.cc.today{border-color:rgba(124,106,247,.5);background:rgba(124,106,247,.05);}
+.cn{font-size:.75rem;font-weight:600;color:var(--text2);margin-bottom:3px;}
+.ce{font-size:.6rem;padding:2px 5px;border-radius:4px;margin-bottom:2px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;}
+.ei{background:var(--blue-dim);color:var(--blue);}
+.es{background:var(--green-dim);color:var(--green);}
+.eo{background:var(--coral-dim);color:var(--coral);}
+.occ-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:.875rem;}
+.oc{background:var(--bg4);border:1px solid var(--border);border-radius:var(--r);padding:1rem;transition:all .2s;}
+.oc:hover{border-color:var(--border2);transform:translateY(-1px);}
+.oc.occ{background:rgba(74,222,128,.05);border-color:rgba(74,222,128,.2);}
+.oc.co-day{background:rgba(248,113,113,.05);border-color:rgba(248,113,113,.2);}
+.oan{font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;letter-spacing:-.02em;margin-bottom:4px;}
+.ost{font-size:.72rem;color:var(--text3);}
+.ogu{font-size:.78rem;font-weight:600;color:var(--text);margin-top:8px;}
+.dli{display:flex;align-items:center;gap:10px;padding:.7rem 0;border-bottom:1px solid rgba(255,255,255,.04);}
+.dli:last-child{border-bottom:none;}
+.dld{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.dlc{flex:1;}
+.dln{font-size:.825rem;font-weight:600;color:#fff;}
+.dlm{font-size:.72rem;color:var(--text3);margin-top:1px;}
+/* CHECK-IN */
+.ci-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:1rem;}
+.ci-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:1.25rem;transition:all .2s;}
+.ci-card:hover{border-color:var(--border2);}
+.ci-card.pending{border-left:3px solid var(--blue);}
+.ci-card.done{border-left:3px solid var(--green);opacity:.7;}
+.ci-card.today-ci{border-left:3px solid var(--accent);box-shadow:0 0 20px rgba(124,106,247,.12);}
+.ci-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:.875rem;}
+.ci-apt{font-family:'Syne',sans-serif;font-size:1.05rem;font-weight:800;color:#fff;}
+.ci-name{font-size:.9rem;font-weight:600;color:var(--text);margin-bottom:2px;}
+.ci-tel{font-size:.75rem;color:var(--text3);}
+.ci-dates{display:flex;gap:.75rem;margin:.75rem 0;flex-wrap:wrap;}
+.ci-date-pill{background:var(--bg4);border:1px solid var(--border);border-radius:8px;padding:.35rem .7rem;font-size:.72rem;color:var(--text2);}
+.ci-date-pill strong{color:#fff;display:block;font-size:.78rem;}
+.ci-guests{margin:.75rem 0;display:flex;flex-wrap:wrap;gap:5px;}
+.gst-tag{background:rgba(124,106,247,.1);border:1px solid rgba(124,106,247,.2);color:var(--accent2);padding:3px 9px;border-radius:20px;font-size:.7rem;display:inline-flex;align-items:center;gap:5px;}
+.gst-host{background:rgba(45,212,176,.1);border:1px solid rgba(45,212,176,.2);color:var(--teal);}
+.ci-actions{display:flex;gap:.5rem;margin-top:1rem;flex-wrap:wrap;}
+.ci-confirm-btn{flex:1;background:linear-gradient(135deg,var(--accent),#6356e8);color:#fff;border:none;border-radius:var(--r-sm);padding:.55rem .8rem;font-size:.78rem;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:6px;}
+.ci-confirm-btn:hover{transform:translateY(-1px);box-shadow:0 4px 16px var(--accent-glow);}
+.ci-confirm-btn:disabled{background:var(--bg4);color:var(--text3);cursor:default;transform:none;box-shadow:none;border:1px solid var(--border);}
+.ci-tabs{display:flex;gap:3px;background:var(--bg4);border:1px solid var(--border);border-radius:10px;padding:3px;margin-bottom:1.5rem;width:fit-content;}
+.ci-tab{padding:.45rem 1rem;border-radius:7px;font-size:.78rem;font-weight:600;cursor:pointer;color:var(--text2);transition:all .2s;}
+.ci-tab.active{background:var(--bg3);color:#fff;box-shadow:0 1px 4px rgba(0,0,0,.3);}
+/* GUESTS */
+.guests-section{grid-column:1/-1;border-top:1px solid var(--border);padding-top:1rem;margin-top:.25rem;}
+.guests-list{display:flex;flex-direction:column;gap:.5rem;margin:.75rem 0;}
+.guest-row{display:flex;gap:.5rem;align-items:center;}
+.guest-row input{flex:1;}
+.rmg-btn{width:28px;height:28px;flex-shrink:0;background:var(--coral-dim);border:1px solid rgba(248,113,113,.3);border-radius:6px;color:var(--coral);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.85rem;transition:all .15s;}
+.rmg-btn:hover{background:rgba(248,113,113,.2);}
+.add-guest-btn{background:var(--glass);border:1px dashed var(--border2);border-radius:var(--r-sm);padding:.5rem;color:var(--text3);font-size:.78rem;cursor:pointer;transition:all .15s;width:100%;font-family:'Inter',sans-serif;display:flex;align-items:center;justify-content:center;gap:6px;}
+.add-guest-btn:hover{border-color:var(--accent);color:var(--accent2);background:rgba(124,106,247,.05);}
+/* BACKUP */
+.bk-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;}
+.bk-act{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:1.75rem;display:flex;flex-direction:column;gap:.875rem;transition:border-color .2s;}
+.bk-act:hover{border-color:var(--border2);}
+.bk-ico{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;margin-bottom:.25rem;}
+.bk-act h3{font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;}
+.bk-act p{font-size:.8rem;color:var(--text3);line-height:1.6;}
+.bk-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:.875rem;margin-bottom:1.5rem;}
+.bst{background:var(--bg4);border:1px solid var(--border);border-radius:var(--r-sm);padding:1rem;text-align:center;}
+.bstv{font-family:'Syne',sans-serif;font-size:1.5rem;font-weight:800;letter-spacing:-.03em;}
+.bstl{font-size:.68rem;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-top:3px;}
+.hi{display:flex;align-items:center;gap:12px;padding:.875rem;background:var(--bg4);border:1px solid var(--border);border-radius:var(--r-sm);margin-bottom:.5rem;transition:border-color .2s;}
+.hi:hover{border-color:var(--border2);}
+.hi-ico{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;}
+.hi-inf{flex:1;}
+.hi-n{font-size:.825rem;font-weight:600;color:#fff;}
+.hi-m{font-size:.72rem;color:var(--text3);}
+.rp{background:var(--bg4);border:1px solid var(--border2);border-radius:var(--r-sm);padding:1rem;font-size:.72rem;font-family:monospace;color:var(--text2);max-height:150px;overflow-y:auto;white-space:pre-wrap;word-break:break-all;display:none;margin-top:.75rem;}
+.imp-acts{display:none;gap:8px;margin-top:.75rem;}
+/* CONFIG */
+.cfg-row{display:flex;align-items:center;gap:1rem;padding:1rem 0;border-bottom:1px solid rgba(255,255,255,.04);}
+.cfg-row:last-child{border-bottom:none;}
+.cfg-i{flex:1;}
+.cfg-i strong{font-size:.825rem;font-weight:600;color:#fff;display:block;margin-bottom:2px;}
+.cfg-i span{font-size:.75rem;color:var(--text3);}
+.atag{background:rgba(124,106,247,.12);border:1px solid rgba(124,106,247,.2);color:var(--accent2);padding:4px 10px;border-radius:20px;font-size:.75rem;display:inline-flex;align-items:center;gap:6px;}
+.atag button{background:none;border:none;cursor:pointer;color:var(--accent2);opacity:.6;font-size:.8rem;}
+.atag button:hover{opacity:1;}
+.tog{position:relative;width:40px;height:22px;flex-shrink:0;}
+.tog input{opacity:0;width:0;height:0;}
+.tsl{position:absolute;inset:0;background:var(--bg4);border:1px solid var(--border2);border-radius:20px;cursor:pointer;transition:.2s;}
+.tsl:before{content:'';position:absolute;width:16px;height:16px;left:2px;top:2px;background:var(--text3);border-radius:50%;transition:.2s;}
+.tog input:checked+.tsl{background:var(--accent);border-color:var(--accent);}
+.tog input:checked+.tsl:before{transform:translateX(18px);background:#fff;}
+.sec-t{font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;margin-bottom:1rem;color:#fff;}
+.tw{position:fixed;bottom:1.5rem;right:1.5rem;z-index:2000;display:flex;flex-direction:column;gap:8px;}
+.toast{background:var(--bg3);border:1px solid var(--border2);color:var(--text);padding:.75rem 1rem;border-radius:10px;font-size:.8rem;box-shadow:0 8px 32px rgba(0,0,0,.5);display:flex;align-items:center;gap:8px;animation:tin .3s ease;max-width:300px;}
+.toast.success{border-color:rgba(74,222,128,.4);color:var(--green);}
+.toast.error{border-color:rgba(248,113,113,.4);color:var(--coral);}
+.toast.warn{border-color:rgba(251,191,36,.4);color:var(--gold);}
+@keyframes tin{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+.empty{text-align:center;padding:3.5rem 1rem;}
+.eico{font-size:2.5rem;margin-bottom:1rem;opacity:.25;}
+.empty h3{font-family:'Syne',sans-serif;font-size:1.1rem;color:var(--text2);margin-bottom:6px;}
+.empty p{font-size:.8rem;color:var(--text3);}
+/* CHECKOUT ANTECIPADO */
+.coa-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:1rem;}
+.coa-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:1.25rem;transition:all .2s;border-left:3px solid var(--coral);}
+.coa-card:hover{border-color:var(--coral);box-shadow:0 0 20px rgba(248,113,113,.1);}
+.coa-card.done{border-left-color:var(--green);opacity:.7;}
+.coa-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:.875rem;}
+.coa-apt{font-family:'Syne',sans-serif;font-size:1.05rem;font-weight:800;color:#fff;}
+.coa-name{font-size:.9rem;font-weight:600;color:var(--text);margin-bottom:2px;}
+.coa-tel{font-size:.75rem;color:var(--text3);}
+.coa-dates{display:flex;gap:.75rem;margin:.75rem 0;flex-wrap:wrap;}
+.coa-pill{background:var(--bg4);border:1px solid var(--border);border-radius:8px;padding:.35rem .7rem;font-size:.72rem;color:var(--text2);}
+.coa-pill strong{color:#fff;display:block;font-size:.78rem;}
+.coa-pill.highlight{background:rgba(248,113,113,.1);border-color:rgba(248,113,113,.3);}
+.coa-pill.highlight strong{color:var(--coral);}
+.coa-actions{display:flex;gap:.5rem;margin-top:1rem;flex-wrap:wrap;}
+.coa-btn{flex:1;background:linear-gradient(135deg,var(--coral),#e05555);color:#fff;border:none;border-radius:var(--r-sm);padding:.55rem .8rem;font-size:.78rem;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:6px;}
+.coa-btn:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(248,113,113,.3);}
+.coa-btn:disabled{background:var(--bg4);color:var(--text3);cursor:default;transform:none;box-shadow:none;border:1px solid var(--border);}
+.coa-info{background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.2);border-radius:var(--r-sm);padding:.75rem 1rem;font-size:.78rem;color:var(--text2);line-height:1.6;margin-bottom:1rem;}
+.coa-info strong{color:var(--coral);}
+/* RELATÓRIO */
+.rel-filters{display:flex;gap:.75rem;align-items:flex-end;flex-wrap:wrap;margin-bottom:1.5rem;}
+.rel-filter-group{display:flex;flex-direction:column;gap:5px;}
+.rel-filter-group label{font-size:.72rem;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;}
+.rel-section{margin-bottom:1.5rem;}
+.rel-section-title{font-family:'Syne',sans-serif;font-size:.85rem;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.75rem;display:flex;align-items:center;gap:8px;}
+.rel-section-title span{background:var(--glass);border:1px solid var(--border);border-radius:20px;padding:2px 10px;font-size:.7rem;}
+.rel-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;}
+.rel-row{display:grid;grid-template-columns:1fr 1.2fr .8fr .8fr .8fr .7fr;gap:0;border-bottom:1px solid rgba(255,255,255,.04);transition:background .15s;}
+.rel-row:last-child{border-bottom:none;}
+.rel-row:hover{background:var(--glass);}
+.rel-row.header{background:var(--bg4);border-bottom:1px solid var(--border);}
+.rel-cell{padding:.75rem 1rem;font-size:.8rem;color:var(--text);}
+.rel-row.header .rel-cell{font-size:.68rem;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);font-weight:600;}
+.rel-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:.875rem;margin-bottom:1.5rem;}
+.rel-sum-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r-sm);padding:1rem;text-align:center;}
+.rel-sum-val{font-family:'Syne',sans-serif;font-size:1.6rem;font-weight:800;letter-spacing:-.03em;}
+.rel-sum-lbl{font-size:.68rem;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-top:3px;}
 
-# Inicie o git
-git init
+/* PRINT */
+@media print{
+  body{background:#fff!important;color:#000!important;}
+  .sidebar,.alert-bar,.tw,.mo,.loading-overlay{display:none!important;}
+  .main{margin-left:0!important;padding:0!important;}
+  .page{display:none!important;}
+  #page-relatorio{display:block!important;}
+  .ph .btn,.rel-filters .btn{display:none!important;}
+  .rel-card{border:1px solid #ddd!important;background:#fff!important;}
+  .rel-row{background:#fff!important;border-bottom:1px solid #eee!important;}
+  .rel-row.header{background:#f5f5f5!important;}
+  .rel-cell{color:#000!important;font-size:.75rem!important;}
+  .rel-section-title{color:#333!important;}
+  .rel-sum-card{background:#f9f9f9!important;border:1px solid #ddd!important;}
+  .rel-sum-val,.rel-sum-lbl{color:#000!important;}
+  .print-header{display:block!important;}
+  .badge{border:1px solid #ccc!important;color:#333!important;background:#f0f0f0!important;}
+}
+.print-header{display:none;text-align:center;margin-bottom:1.5rem;border-bottom:2px solid #000;padding-bottom:1rem;}
+.print-header h1{font-size:1.4rem;font-weight:700;}
+.print-header p{font-size:.8rem;color:#555;margin-top:4px;}
+/* LOGIN */
+.login-screen{position:fixed;inset:0;background:var(--bg);z-index:9998;display:flex;align-items:center;justify-content:center;}
+.login-screen.hidden{display:none;}
+.login-box{background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r-lg);padding:2.5rem;width:100%;max-width:380px;box-shadow:0 24px 80px rgba(0,0,0,.6);}
+.login-logo{display:flex;align-items:center;gap:10px;margin-bottom:1.75rem;justify-content:center;}
+.login-logo-ico{width:40px;height:40px;background:linear-gradient(135deg,var(--accent),var(--teal));border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;box-shadow:0 0 24px var(--accent-glow);}
+.login-logo h1{font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:800;background:linear-gradient(135deg,#fff 40%,var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.login-title{font-family:'Syne',sans-serif;font-size:1.5rem;font-weight:800;text-align:center;margin-bottom:.35rem;}
+.login-sub{font-size:.8rem;color:var(--text3);text-align:center;margin-bottom:1.75rem;}
+.login-field{display:flex;flex-direction:column;gap:5px;margin-bottom:1rem;}
+.login-field label{font-size:.75rem;font-weight:600;color:var(--text2);}
+.login-field input{padding:.7rem 1rem;font-size:.9rem;}
+.login-btn{width:100%;background:linear-gradient(135deg,var(--accent),#6356e8);color:#fff;border:none;border-radius:var(--r-sm);padding:.75rem;font-size:.9rem;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;transition:all .2s;margin-top:.5rem;}
+.login-btn:hover{transform:translateY(-1px);box-shadow:0 8px 28px var(--accent-glow);}
+.login-err{font-size:.78rem;color:var(--coral);text-align:center;margin-top:.75rem;display:none;}
+.login-footer{font-size:.65rem;color:var(--text3);text-align:center;margin-top:1.5rem;line-height:1.6;}
+.logout-btn{background:var(--glass);border:1px solid var(--border);border-radius:20px;padding:.3rem .75rem;font-size:.68rem;color:var(--text3);cursor:pointer;transition:all .15s;font-family:'Inter',sans-serif;margin-top:.5rem;width:100%;}
+.logout-btn:hover{color:var(--coral);border-color:rgba(248,113,113,.3);}
+.sync-bar{display:flex;align-items:center;gap:6px;background:var(--glass);border:1px solid var(--border);border-radius:20px;padding:.3rem .75rem;font-size:.7rem;color:var(--text3);}
+.table-wrap{overflow-x:auto;}
+@media(max-width:768px){
+  .sidebar{width:100%;height:auto;position:relative;}
+  .main{margin-left:0;padding:1rem;}
+  .stats-grid{grid-template-columns:1fr 1fr;}
+  .fg-grid{grid-template-columns:1fr;}
+  .bk-grid{grid-template-columns:1fr;}
+  .bk-stats{grid-template-columns:1fr 1fr;}
+  .cc .ce{display:none;}
+}
+</style>
+</head>
+<body>
 
-# Crie o arquivo index.html e cole o código do sistema
-# (o HTML que você já tem)
+<!-- LOADING -->
+<div class="loading-overlay" id="loading">
+  <div class="spinner"></div>
+  <div class="loading-txt">Conectando ao banco de dados…</div>
+</div>
 
-git add .
-git commit -m "feat: Metropolitan Flat v1.0"
+<div class="app">
+<aside class="sidebar">
+  <div class="logo">
+    <div class="logo-row">
+      <div class="logo-ico">🏠</div>
+      <h1>Metropolitan Flat</h1>
+    </div>
+    <div class="logo-sub">Gestão de Reservas</div>
+  </div>
+  <nav class="nav">
+    <div class="nav-sec">Principal</div>
+    <div class="ni active" onclick="showPage('dashboard',this)"><div class="ni-ico">◉</div>Painel</div>
+    <div class="ni" onclick="showPage('reservas',this)"><div class="ni-ico">≡</div>Reservas<span class="ni-badge" id="nav-cnt">0</span></div>
+    <div class="ni" onclick="showPage('checkin',this)"><div class="ni-ico">✓</div>Check-in<span class="ni-badge" id="nav-ci" style="background:var(--teal);box-shadow:0 0 8px rgba(45,212,176,.4);">0</span></div>
+    <div class="ni" onclick="showPage('checkout',this)"><div class="ni-ico">🚪</div>Check-out<span class="ni-badge" id="nav-co" style="background:var(--coral);box-shadow:0 0 8px rgba(248,113,113,.4);">0</span></div>
+    <div class="ni" onclick="showPage('calendario',this)"><div class="ni-ico">▦</div>Calendário</div>
+    <div class="nav-sec">Gestão</div>
+    <div class="ni" onclick="showPage('apartamentos',this)"><div class="ni-ico">⊞</div>Apartamentos</div>
+    <div class="ni" onclick="showPage('relatorio',this)"><div class="ni-ico">📋</div>Relatórios</div>
+    <div class="ni" onclick="showPage('backup',this)"><div class="ni-ico">💾</div>Backup</div>
+    <div class="ni" onclick="showPage('configuracoes',this)"><div class="ni-ico">⚙</div>Configurações</div>
+  </nav>
+  <div class="sidebar-bot">
+    <div class="clock-pill" id="clock">--:--</div>
+    <div style="margin-top:.6rem;display:flex;align-items:center;justify-content:center;">
+      <span class="sync-dot" id="sync-dot"></span>
+      <span class="sync-label" id="sync-label">Conectando…</span>
+    </div>
+    <div style="margin-top:.75rem;font-size:.62rem;color:var(--text3);line-height:1.6;text-align:center;">
+      © <span id="copy-year"></span> Metropolitan Flat<br>
+      <span style="opacity:.7;">Todos os direitos reservados a<br><strong style="color:var(--text2);font-weight:600;">Helbert Brito</strong></span>
+    </div>
+  </div>
+</aside>
 
-# Crie o repositório no GitHub (via site ou CLI)
-gh repo create metropolitan-flat --public
-git push -u origin main
+<main class="main">
+  <div class="alert-bar" id="alrt" style="display:none">
+    <strong>⚠ Check-outs hoje:</strong>
+    <span id="alrt-msg"></span>
+    <button class="adis" onclick="this.parentElement.style.display='none'">✕</button>
+  </div>
+
+  <!-- PAINEL -->
+  <div class="page active" id="page-dashboard">
+    <div class="ph">
+      <div><div class="pt">Painel</div><div class="ps" id="today-lbl"></div></div>
+      <button class="btn btn-p" onclick="openModal()">＋ Nova Reserva</button>
+    </div>
+    <div class="stats-grid">
+      <div class="sc"><div class="sc-glow" style="background:rgba(124,106,247,.4)"></div><div class="sc-lbl">Reservas Ativas</div><div class="sc-val" style="color:var(--accent2)" id="sv1">0</div><div class="sc-meta">em andamento agora</div><div class="sc-ico">🟣</div></div>
+      <div class="sc"><div class="sc-glow" style="background:rgba(248,113,113,.35)"></div><div class="sc-lbl">Check-outs Hoje</div><div class="sc-val" style="color:var(--coral)" id="sv2">0</div><div class="sc-meta">saídas programadas</div><div class="sc-ico">🔴</div></div>
+      <div class="sc"><div class="sc-glow" style="background:rgba(45,212,176,.35)"></div><div class="sc-lbl">Faturamento Mês</div><div class="sc-val" style="color:var(--teal);font-size:1.5rem;" id="sv3">R$0</div><div class="sc-meta" id="sv3m">0 reservas</div><div class="sc-ico">💚</div></div>
+      <div class="sc"><div class="sc-glow" style="background:rgba(96,165,250,.35)"></div><div class="sc-lbl">Check-ins Hoje</div><div class="sc-val" style="color:var(--blue)" id="sv4">0</div><div class="sc-meta">chegadas esperadas</div><div class="sc-ico">🔵</div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;">
+      <div class="card"><div style="font-size:.72rem;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);font-weight:600;margin-bottom:1rem;">Movimentação do Dia</div><div id="d-hoje"></div></div>
+      <div class="card"><div style="font-size:.72rem;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);font-weight:600;margin-bottom:1rem;">Próximas Entradas (7 dias)</div><div id="d-prox"></div></div>
+    </div>
+    <div class="card"><div style="font-size:.72rem;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);font-weight:600;margin-bottom:1rem;">Ocupação dos Apartamentos</div><div class="occ-grid" id="d-occ"></div></div>
+  </div>
+
+  <!-- RESERVAS -->
+  <div class="page" id="page-reservas">
+    <div class="ph">
+      <div><div class="pt">Reservas</div><div class="ps">Todas as reservas cadastradas</div></div>
+      <button class="btn btn-p" onclick="openModal()">＋ Nova Reserva</button>
+    </div>
+    <div class="toolbar">
+      <div class="sw"><span class="si">🔍</span><input type="text" id="si" placeholder="Buscar hóspede ou apartamento…" oninput="renderTable()"></div>
+      <select id="ff-st" onchange="renderTable()" style="width:170px;"><option value="">Todos os status</option><option value="confirmado">Aguardando Check-in</option><option value="ativo">Em andamento</option><option value="finalizado">Finalizado</option></select>
+      <select id="ff-ap" onchange="renderTable()" style="width:160px;"></select>
+    </div>
+    <div class="card" style="padding:0;overflow:hidden;">
+      <div class="table-wrap"><table><thead><tr><th>Hóspede</th><th>Apartamento</th><th>Check-in</th><th>Check-out</th><th>Diárias</th><th>Hóspedes</th><th>Valor</th><th>Status</th><th>Ações</th></tr></thead><tbody id="tb"></tbody></table></div>
+      <div class="empty" id="te" style="display:none"><div class="eico">🏠</div><h3>Nenhuma reserva encontrada</h3><p>Ajuste os filtros ou crie uma nova reserva</p></div>
+    </div>
+  </div>
+
+  <!-- CHECK-IN -->
+  <div class="page" id="page-checkin">
+    <div class="ph">
+      <div><div class="pt">Check-in</div><div class="ps">Confirme a chegada dos hóspedes e gerencie acompanhantes</div></div>
+      <button class="btn btn-p" onclick="openModal()">＋ Nova Reserva</button>
+    </div>
+    <div class="ci-tabs">
+      <div class="ci-tab active" onclick="setCiTab('pendente',this)">Pendentes</div>
+      <div class="ci-tab" onclick="setCiTab('hoje',this)">Chegando Hoje</div>
+      <div class="ci-tab" onclick="setCiTab('confirmado',this)">Confirmados</div>
+      <div class="ci-tab" onclick="setCiTab('todos',this)">Todos</div>
+    </div>
+    <div class="ci-grid" id="ci-grid"></div>
+    <div class="empty" id="ci-empty" style="display:none"><div class="eico">✅</div><h3>Tudo em ordem!</h3><p>Nenhuma reserva nesta categoria.</p></div>
+  </div>
+
+  <!-- CHECK-OUT ANTECIPADO -->
+  <div class="page" id="page-checkout">
+    <div class="ph">
+      <div><div class="pt">Check-out Antecipado</div><div class="ps">Registre saídas antes da data prevista</div></div>
+      <div class="sync-bar"><span class="sync-dot" id="sync-dot2"></span><span id="sync-label2">–</span></div>
+    </div>
+    <div class="coa-info">
+      <strong>⚠ Atenção:</strong> O check-out antecipado encerra a reserva antes da data original. O sistema registra a data/hora real da saída e libera o apartamento automaticamente.
+    </div>
+    <div class="coa-grid" id="coa-grid"></div>
+    <div class="empty" id="coa-empty" style="display:none">
+      <div class="eico">🚪</div>
+      <h3>Nenhuma reserva ativa</h3>
+      <p>Não há hóspedes em estadia no momento.</p>
+    </div>
+  </div>
+
+  <!-- CALENDÁRIO -->
+  <div class="page" id="page-calendario">
+    <div class="ph">
+      <div><div class="pt">Calendário</div><div class="ps">Visão mensal das reservas</div></div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <button class="btn btn-g btn-sm" onclick="chMon(-1)">← Anterior</button>
+        <span id="cal-lbl" style="font-family:'Syne',sans-serif;font-weight:700;font-size:.9rem;min-width:150px;text-align:center;"></span>
+        <button class="btn btn-g btn-sm" onclick="chMon(1)">Próximo →</button>
+      </div>
+    </div>
+    <div class="card" style="padding:1.25rem;">
+      <div class="cal-grid" id="cal-hdr"></div>
+      <div class="cal-grid" id="cal-body" style="margin-top:4px;"></div>
+    </div>
+    <div style="display:flex;gap:1.25rem;margin-top:1rem;font-size:.75rem;flex-wrap:wrap;">
+      <span style="display:flex;align-items:center;gap:5px;"><span style="background:var(--blue-dim);color:var(--blue);padding:2px 8px;border-radius:4px;font-weight:600;">■</span> Check-in</span>
+      <span style="display:flex;align-items:center;gap:5px;"><span style="background:var(--green-dim);color:var(--green);padding:2px 8px;border-radius:4px;font-weight:600;">■</span> Em estadia</span>
+      <span style="display:flex;align-items:center;gap:5px;"><span style="background:var(--coral-dim);color:var(--coral);padding:2px 8px;border-radius:4px;font-weight:600;">■</span> Check-out</span>
+    </div>
+  </div>
+
+  <!-- APARTAMENTOS -->
+  <div class="page" id="page-apartamentos">
+    <div class="ph"><div><div class="pt">Apartamentos</div><div class="ps">Status atual de cada unidade</div></div></div>
+    <div class="occ-grid" id="apt-grid"></div>
+  </div>
+
+  <!-- RELATÓRIOS -->
+  <div class="page" id="page-relatorio">
+    <div class="print-header">
+      <h1>Metropolitan Flat — Relatório</h1>
+      <p id="print-subtitle"></p>
+    </div>
+    <div class="ph">
+      <div><div class="pt">Relatórios</div><div class="ps">Gere e imprima relatórios por data</div></div>
+      <button class="btn btn-p" onclick="printRel()">🖨️ Imprimir Relatório</button>
+    </div>
+    <div class="rel-filters">
+      <div class="rel-filter-group">
+        <label>Tipo de Relatório</label>
+        <select id="rel-tipo" onchange="renderRel()" style="width:220px;">
+          <option value="dia">Movimentação do Dia</option>
+          <option value="checkin">Check-ins por Data</option>
+          <option value="checkout">Check-outs por Data</option>
+          <option value="periodo">Todas as Reservas (Período)</option>
+          <option value="financeiro">Relatório Financeiro</option>
+        </select>
+      </div>
+      <div class="rel-filter-group">
+        <label>Data Inicial</label>
+        <input type="date" id="rel-di" onchange="renderRel()" style="width:160px;">
+      </div>
+      <div class="rel-filter-group" id="rel-df-wrap">
+        <label>Data Final</label>
+        <input type="date" id="rel-df" onchange="renderRel()" style="width:160px;">
+      </div>
+      <div class="rel-filter-group">
+        <label>Apartamento</label>
+        <select id="rel-apt" onchange="renderRel()" style="width:160px;">
+          <option value="">Todos</option>
+        </select>
+      </div>
+    </div>
+    <div id="rel-summary" class="rel-summary"></div>
+    <div id="rel-content"></div>
+  </div>
+
+  <!-- BACKUP -->
+  <div class="page" id="page-backup">
+    <div class="ph"><div><div class="pt">Backup</div><div class="ps">Exporte, importe e proteja seus dados</div></div></div>
+    <div class="bk-stats">
+      <div class="bst"><div class="bstv" style="color:var(--accent2)" id="bk-tot">0</div><div class="bstl">Reservas</div></div>
+      <div class="bst"><div class="bstv" style="color:var(--teal)" id="bk-sz">0 KB</div><div class="bstl">Tamanho</div></div>
+      <div class="bst"><div class="bstv" style="color:var(--gold);font-size:1.1rem;" id="bk-last">—</div><div class="bstl">Último Backup</div></div>
+    </div>
+    <div class="bk-grid">
+      <div class="bk-act"><div class="bk-ico" style="background:rgba(124,106,247,.15);">📦</div><h3>Exportar JSON</h3><p>Salva todas as reservas e configurações em um arquivo .json que pode ser restaurado a qualquer momento.</p><button class="btn btn-p btn-sm" onclick="exportJSON()">⬇ Baixar Backup JSON</button></div>
+      <div class="bk-act"><div class="bk-ico" style="background:rgba(45,212,176,.15);">📊</div><h3>Exportar CSV</h3><p>Gera uma planilha .csv com todas as reservas para abrir no Excel ou Google Sheets.</p><button class="btn btn-t btn-sm" onclick="exportCSV()">⬇ Baixar Planilha CSV</button></div>
+      <div class="bk-act"><div class="bk-ico" style="background:rgba(251,191,36,.15);">📂</div><h3>Importar Backup</h3><p>Restaura dados a partir de um arquivo .json exportado anteriormente.</p>
+        <input type="file" id="imp-file" accept=".json" style="display:none" onchange="previewImport(event)">
+        <button class="btn btn-g btn-sm" onclick="document.getElementById('imp-file').click()">⬆ Selecionar Arquivo JSON</button>
+        <div class="rp" id="rp"></div>
+        <div class="imp-acts" id="imp-acts"><button class="btn btn-p btn-sm" onclick="confirmImport()">✓ Confirmar</button><button class="btn btn-g btn-sm" onclick="cancelImport()">Cancelar</button></div>
+      </div>
+      <div class="bk-act"><div class="bk-ico" style="background:rgba(248,113,113,.15);">🗑️</div><h3>Limpar Dados</h3><p>Remove todas as reservas do sistema. Esta ação não pode ser desfeita. Exporte um backup antes.</p><button class="btn btn-d btn-sm" onclick="clearAll()">⚠ Limpar Todas as Reservas</button></div>
+    </div>
+    <div style="margin-top:1.5rem;"><div class="sec-t">Histórico de Backups</div><div id="bk-hist"></div></div>
+  </div>
+
+  <!-- CONFIGURAÇÕES -->
+  <div class="page" id="page-configuracoes">
+    <div class="ph">
+      <div><div class="pt">Configurações</div><div class="ps">Preferências e personalização</div></div>
+      <button class="btn btn-p" onclick="saveConfig()">Salvar Alterações</button>
+    </div>
+    <div class="card">
+      <div class="sec-t">Alertas de Check-out</div>
+      <div class="cfg-row"><div class="cfg-i"><strong>Horário padrão de check-out</strong><span>Usado nas mensagens automáticas</span></div><input type="time" id="cfg-t" value="11:00" style="width:110px;"></div>
+      <div class="cfg-row"><div class="cfg-i"><strong>Antecedência do alerta</strong><span>Horas antes do check-out</span></div><select id="cfg-h" style="width:160px;"><option value="0">No dia</option><option value="1">1 hora antes</option><option value="2" selected>2 horas antes</option><option value="3">3 horas antes</option><option value="24">1 dia antes</option></select></div>
+      <div class="cfg-row"><div class="cfg-i"><strong>Notificações na tela</strong><span>Exibir barra de alerta</span></div><label class="tog"><input type="checkbox" id="cfg-n" checked><span class="tsl"></span></label></div>
+    </div>
+    <div class="card" style="margin-top:1rem;">
+      <div class="sec-t">Mensagem WhatsApp</div>
+      <p style="font-size:.78rem;color:var(--text3);margin-bottom:.75rem;">Variáveis: <code style="background:var(--bg4);padding:1px 5px;border-radius:4px;color:var(--accent2)">{nome}</code> <code style="background:var(--bg4);padding:1px 5px;border-radius:4px;color:var(--accent2)">{apartamento}</code> <code style="background:var(--bg4);padding:1px 5px;border-radius:4px;color:var(--accent2)">{horario}</code></p>
+      <textarea id="cfg-msg" rows="4" style="width:100%;resize:vertical;"></textarea>
+    </div>
+    <div class="card" style="margin-top:1rem;">
+      <div class="sec-t">Apartamentos Cadastrados</div>
+      <div style="display:flex;gap:.75rem;margin-bottom:.875rem;"><input type="text" id="napt" placeholder="Ex: Apto 303" style="flex:1;"><button class="btn btn-p btn-sm" onclick="addApt()">＋ Adicionar</button></div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;" id="atags"></div>
+    </div>
+  </div>
+</main>
+</div>
+
+<!-- MODAL RESERVA -->
+<div class="mo" id="mo">
+  <div class="modal">
+    <div class="mh"><div class="mt" id="mo-t">Nova Reserva</div><button class="cx" onclick="closeModal()">✕</button></div>
+    <div class="mb">
+      <div class="fg-grid">
+        <div class="fg full"><label>Nome do Hóspede *</label><input type="text" id="f-nm" placeholder="Nome completo"><span class="ferr" id="e-nm"></span></div>
+        <div class="fg"><label>Telefone / WhatsApp *</label><input type="tel" id="f-tl" placeholder="(11) 99999-9999"><span class="ferr" id="e-tl"></span></div>
+        <div class="fg"><label>Apartamento *</label><select id="f-ap"><option value="">Selecione…</option></select><span class="ferr" id="e-ap"></span></div>
+        <div class="fg"><label>Tipo de Documento</label><select id="f-doctp"><option value="CPF">CPF</option><option value="RG">RG</option><option value="Passaporte">Passaporte</option><option value="CNH">CNH</option><option value="Outro">Outro</option></select></div>
+        <div class="fg"><label>Número do Documento</label><input type="text" id="f-doc" placeholder="000.000.000-00"></div>
+        <div class="fg"><label>Data de Check-in *</label><input type="date" id="f-ci" onchange="calcN()"><span class="ferr" id="e-ci"></span></div>
+        <div class="fg"><label>Hora de Check-in</label><input type="time" id="f-ci-hora" placeholder="Ex: 14:00"></div>
+        <div class="fg"><label>Data de Check-out *</label><input type="date" id="f-co" onchange="calcN()"><span class="ferr" id="e-co"></span></div>
+        <div class="fg"><label>Hora de Check-out</label><input type="time" id="f-co-hora" placeholder="Ex: 11:00"></div>
+        <div class="fg full"><div class="dp" id="dpill"></div></div>
+        <div class="fg"><label>Valor da Estadia (R$) *</label><input type="number" id="f-vl" placeholder="0,00" step="0.01" min="0"><span class="ferr" id="e-vl"></span></div>
+        <div class="fg"><label>Status</label><select id="f-st"><option value="confirmado">Aguardando Check-in</option><option value="ativo">Em andamento</option><option value="finalizado">Finalizado</option></select></div>
+        <div class="fg full"><label>Observações</label><textarea id="f-ob" rows="2" placeholder="Informações adicionais…" style="resize:vertical;"></textarea></div>
+        <div class="guests-section">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem;">
+            <label style="font-size:.82rem;color:#fff;font-weight:600;">👥 Hóspedes Adicionais</label>
+            <span style="font-size:.7rem;color:var(--text3);">além do responsável pela reserva</span>
+          </div>
+          <div class="guests-list" id="guests-list"></div>
+          <button type="button" class="add-guest-btn" onclick="addGuestField()">＋ Adicionar Acompanhante</button>
+        </div>
+      </div>
+    </div>
+    <div class="mf"><button class="btn btn-g" onclick="closeModal()">Cancelar</button><button class="btn btn-p" onclick="saveRes()" id="mo-btn">Salvar Reserva</button></div>
+  </div>
+</div>
+
+<!-- MODAL WA -->
+<div class="mo" id="mo-wa">
+  <div class="modal" style="max-width:420px;">
+    <div class="mh"><div class="mt">📱 WhatsApp</div><button class="cx" onclick="document.getElementById('mo-wa').classList.remove('open')">✕</button></div>
+    <div class="mb"><p style="font-size:.8rem;color:var(--text3);margin-bottom:.875rem;">Mensagem para o hóspede:</p><div id="wa-txt" style="background:var(--bg4);border:1px solid var(--border);border-radius:var(--r-sm);padding:1rem;font-size:.825rem;line-height:1.7;"></div></div>
+    <div class="mf"><button class="btn btn-g" onclick="document.getElementById('mo-wa').classList.remove('open')">Fechar</button><button class="btn btn-p" onclick="doWA()">Abrir WhatsApp ↗</button></div>
+  </div>
+</div>
+
+<div class="tw" id="tw"></div>
+
+<script>
+// ══ SUPABASE CONFIG ══
+const SB_URL = 'https://sgnmqraqpukneavopjos.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNnbm1xcmFxcHVrbmVhdm9wam9zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQxMDg3MzMsImV4cCI6MjA4OTY4NDczM30.J_CfZQiWcpGOgGb7dwAoKOo7y1zKBI7_zMf75FVdA_M';
+
+// ══ SUPABASE CLIENT ══
+const sb = {
+  async query(table, method='GET', body=null, filters=''){
+    const url = `${SB_URL}/rest/v1/${table}${filters}`;
+    const headers = {
+      'apikey': SB_KEY,
+      'Authorization': `Bearer ${SB_KEY}`,
+      'Content-Type': 'application/json',
+      'X-Client-Info': 'metropolitan-flat/1.0',
+      'Prefer': 'return=representation'
+    };
+    const res = await fetch(url, {method, headers, body: body?JSON.stringify(body):null});
+    if(!res.ok){const err=await res.text();throw new Error(err);}
+    const txt = await res.text();
+    return txt ? JSON.parse(txt) : [];
+  },
+  async getAll(table){ return await sb.query(table,'GET',null,'?order=ts.desc'); },
+  async upsert(table, data){ return await sb.query(table,'POST',data,'?on_conflict=id'); },
+  async delete(table, id){ return await sb.query(table,'DELETE',null,`?id=eq.${id}`); },
+  async getCfg(){ try{ const r=await sb.query('configuracoes','GET',null,'?id=eq.main'); return r[0]?.data||null; }catch{return null;} },
+  async saveCfg(data){ return await sb.query('configuracoes','POST',{id:'main',data},'?on_conflict=id'); }
+};
+
+// ══ STATE ══
+let R = [];
+let CFG = {time:'11:00',hours:2,notif:true,msg:'Olá {nome}! Seu check-out no {apartamento} é hoje às {horario}. Esperamos que tenha aproveitado! 🏠',apts:['Apto 101','Apto 102','Apto 201','Apto 202','Apto 301']};
+let BKH = JSON.parse(localStorage.getItem('BKH')||'[]');
+let eid=null, cM=new Date().getMonth(), cY=new Date().getFullYear();
+let ciTab='pendente', pImport=null, waNum='', waMsg='';
+
+// ══ SYNC STATUS ══
+function syncStatus(state){
+  const dot=document.getElementById('sync-dot');
+  const lbl=document.getElementById('sync-label');
+  dot.className='sync-dot '+state;
+  if(state==='ok'){lbl.textContent='Conectado ✓';}
+  else if(state==='syncing'){lbl.textContent='Sincronizando…';}
+  else if(state==='err'){lbl.textContent='Sem conexão';}
+  else{lbl.textContent='Conectando…';}
+}
+
+// ══ LOGIN ══
+const SENHA = 'metropolitan2024'; // ← MUDE AQUI SUA SENHA
+function checkLogin(){
+  document.getElementById('login-year').textContent=new Date().getFullYear();
+  const ok=sessionStorage.getItem('mf_auth')==='ok';
+  if(ok){document.getElementById('login-screen').classList.add('hidden');return true;}
+  document.getElementById('login-screen').style.display='flex';
+  return false;
+}
+function doLogin(){
+  const s=document.getElementById('login-senha').value;
+  const err=document.getElementById('login-err');
+  if(s===SENHA){
+    sessionStorage.setItem('mf_auth','ok');
+    document.getElementById('login-screen').classList.add('hidden');
+    document.getElementById('login-senha').value='';
+    err.style.display='none';
+    boot();
+  } else {
+    err.style.display='block';
+    document.getElementById('login-senha').value='';
+    document.getElementById('login-senha').focus();
+  }
+}
+function doLogout(){
+  if(!confirm('Deseja sair do sistema?'))return;
+  sessionStorage.removeItem('mf_auth');
+  location.reload();
+}
+
+// ══ BOOT ══
+function withTimeout(promise, ms){
+  return Promise.race([
+    promise,
+    new Promise((_,reject)=>setTimeout(()=>reject(new Error('timeout')),ms))
+  ]);
+}
+async function boot(){
+  tick(); setInterval(tick,1000);
+  document.getElementById('today-lbl').textContent = new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  document.getElementById('copy-year').textContent = new Date().getFullYear();
+  syncStatus('syncing');
+  try {
+    const rows = await withTimeout(sb.getAll('reservas'), 8000);
+    R = rows.map(dbToLocal);
+    localStorage.setItem('R', JSON.stringify(R));
+    const cfg = await withTimeout(sb.getCfg(), 5000);
+    if(cfg) CFG = cfg;
+    localStorage.setItem('CFG',JSON.stringify(CFG));
+    syncStatus('ok');
+  } catch(e) {
+    console.error('Boot error:', e);
+    syncStatus('err');
+    // Sempre carrega do localStorage se Supabase falhar
+    const localR = localStorage.getItem('R');
+    if(localR) try{ R = JSON.parse(localR); }catch{ R=[]; }
+    const localCfg = localStorage.getItem('CFG');
+    if(localCfg) try{ CFG = JSON.parse(localCfg); }catch{}
+    if(e.message==='timeout'){
+      toast('⚠ Conexão lenta. Carregando dados locais…','warn');
+    } else {
+      toast('⚠ Sem conexão com o banco. Modo offline ativo.','warn');
+    }
+  } finally {
+    // SEMPRE esconde o loading, independente do que acontecer
+    document.getElementById('loading').classList.add('hidden');
+  }
+  loadCfgUI(); renderAll(); checkAlerts();
+  // Auto-sincronização a cada 30 segundos
+  setInterval(autoSync, 30000);
+}
+
+// ══ AUTO SYNC ══
+let isSaving = false;
+async function autoSync(){
+  if(isSaving) return;
+  try{
+    const rows = await withTimeout(sb.getAll('reservas'), 6000);
+    const newR = rows.map(dbToLocal);
+    const newCfg = await withTimeout(sb.getCfg(), 4000);
+    let changed = false;
+    if(JSON.stringify(newR) !== JSON.stringify(R)){R=newR;localStorage.setItem('R',JSON.stringify(R));changed=true;}
+    if(newCfg && JSON.stringify(newCfg)!==JSON.stringify(CFG)){CFG=newCfg;loadCfgUI();changed=true;}
+    if(changed){renderAll();toast('🔄 Dados atualizados!','');}
+    syncStatus('ok');
+    const now=new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+    document.getElementById('sync-label').textContent=`Sincronizado ${now}`;
+    const sl2=document.getElementById('sync-label2');
+    if(sl2)sl2.textContent=`Sincronizado ${now}`;
+  }catch(e){
+    syncStatus('err');
+  }
+}
+
+// ══ DB MAPPERS ══
+function localToDB(r){
+  return {
+    id: r.id, nome: r.nome, tel: r.tel, apt: r.apt, ci: r.ci, co: r.co,
+    val: r.val, status: r.status, obs: r.obs||'', guests: r.guests||[],
+    checkin_confirmed: r.checkinConfirmed||false,
+    checkin_time: r.checkinTime||null,
+    checkin_date: r.checkinDate||null,
+    early_checkout: r.earlyCheckout||false,
+    early_checkout_date: r.earlyCheckoutDate||null,
+    early_checkout_time: r.earlyCheckoutTime||null,
+    doc_tipo: r.docTipo||'CPF', doc_numero: r.docNumero||'',
+    hora_ci: r.horaCi||'', hora_co: r.horaCo||'',
+    ts: r.ts||Date.now()
+  };
+}
+function dbToLocal(r){
+  return {
+    id: r.id, nome: r.nome, tel: r.tel, apt: r.apt, ci: r.ci, co: r.co,
+    val: r.val, status: r.status, obs: r.obs||'', guests: r.guests||[],
+    checkinConfirmed: r.checkin_confirmed||false,
+    checkinTime: r.checkin_time||null,
+    checkinDate: r.checkin_date||null,
+    earlyCheckout: r.early_checkout||false,
+    earlyCheckoutDate: r.early_checkout_date||null,
+    earlyCheckoutTime: r.early_checkout_time||null,
+    docTipo: r.doc_tipo||'CPF', docNumero: r.doc_numero||'',
+    horaCi: r.hora_ci||'', horaCo: r.hora_co||'',
+    ts: r.ts||Date.now()
+  };
+}
+
+// ══ SAVE / DELETE ══
+async function saveToDb(r){
+  isSaving=true;
+  syncStatus('syncing');
+  try{
+    // Tenta PATCH primeiro (update), se não existir faz POST (insert)
+    const patchUrl=`${SB_URL}/rest/v1/reservas?id=eq.${r.id}`;
+    const headers={'apikey':SB_KEY,'Authorization':`Bearer ${SB_KEY}`,'Content-Type':'application/json','X-Client-Info':'metropolitan-flat/1.0','Prefer':'return=representation'};
+    const body=localToDB(r);
+    // Verifica se já existe
+    const checkRes=await fetch(`${SB_URL}/rest/v1/reservas?id=eq.${r.id}&select=id`,{headers:{'apikey':SB_KEY,'Authorization':`Bearer ${SB_KEY}`}});
+    const exists=await checkRes.json();
+    if(exists.length>0){
+      // UPDATE
+      const res=await fetch(patchUrl,{method:'PATCH',headers,body:JSON.stringify(body)});
+      if(!res.ok){const err=await res.text();throw new Error(err);}
+    } else {
+      // INSERT
+      const res=await fetch(`${SB_URL}/rest/v1/reservas`,{method:'POST',headers,body:JSON.stringify(body)});
+      if(!res.ok){const err=await res.text();throw new Error(err);}
+    }
+    localStorage.setItem('R',JSON.stringify(R));
+    syncStatus('ok');
+  }catch(e){
+    console.error(e);
+    syncStatus('err');
+    toast('Erro ao salvar: '+e.message,'error');
+    localStorage.setItem('R',JSON.stringify(R));
+  } finally {
+    isSaving=false;
+  }
+}
+async function deleteFromDb(id){
+  isSaving=true;
+  syncStatus('syncing');
+  try{
+    const url=`${SB_URL}/rest/v1/reservas?id=eq.${id}`;
+    const headers={'apikey':SB_KEY,'Authorization':`Bearer ${SB_KEY}`,'Content-Type':'application/json','X-Client-Info':'metropolitan-flat/1.0'};
+    const res=await fetch(url,{method:'DELETE',headers});
+    if(!res.ok){const err=await res.text();throw new Error(err);}
+    localStorage.setItem('R',JSON.stringify(R));
+    syncStatus('ok');
+  }catch(e){
+    syncStatus('err');
+    toast('Erro ao excluir: '+e.message,'error');
+  } finally {
+    isSaving=false;
+  }
+}
+
+// ══ RENDER ALL ══
+function renderAll(){
+  upStats(); renderTable(); renderCal(); renderApts(); renderDash(); renderBk(); renderCiPage(); renderCoPage(); fillSels();
+  document.getElementById('nav-cnt').textContent = R.filter(r=>r.status!=='finalizado').length;
+  const ciTod = R.filter(r=>r.ci===td()&&r.status==='confirmado').length;
+  document.getElementById('nav-ci').textContent = ciTod;
+  const coAtivos = R.filter(r=>r.status==='ativo').length;
+  document.getElementById('nav-co').textContent = coAtivos;
+}
+
+function showPage(id,el){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.ni').forEach(n=>n.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  if(el) el.classList.add('active');
+  if(id==='relatorio') initRel();
+}
+
+// ══ STATS ══
+function upStats(){
+  const t=td();
+  document.getElementById('sv1').textContent=R.filter(r=>r.status==='ativo').length;
+  document.getElementById('sv2').textContent=R.filter(r=>r.co===t).length;
+  document.getElementById('sv4').textContent=R.filter(r=>r.ci===t).length;
+  const m=new Date().getMonth(),y=new Date().getFullYear();
+  const mes=R.filter(r=>{const d=new Date(r.ci+'T12:00');return d.getMonth()===m&&d.getFullYear()===y;});
+  const fat=mes.reduce((s,r)=>s+(parseFloat(r.val)||0),0);
+  document.getElementById('sv3').textContent='R$'+fat.toLocaleString('pt-BR',{maximumFractionDigits:0});
+  document.getElementById('sv3m').textContent=mes.length+' reservas no mês';
+}
+
+// ══ DASHBOARD ══
+function renderDash(){
+  const t=td();
+  const hoje=R.filter(r=>r.ci===t||r.co===t||(r.ci<t&&r.co>t));
+  document.getElementById('d-hoje').innerHTML=hoje.length?hoje.map(r=>`<div class="dli"><div class="dld" style="background:${r.co===t?'var(--coral)':r.ci===t?'var(--blue)':'var(--green)'}"></div><div class="dlc"><div class="dln">${r.nome}</div><div class="dlm">${r.apt} · ${r.co===t?'Check-out hoje':r.ci===t?'Check-in hoje':'Em estadia'}</div></div><span class="badge ${bc(r,t)}">${bl(r,t)}</span></div>`).join(''):`<div style="font-size:.8rem;color:var(--text3);padding:.75rem 0">Nenhuma movimentação hoje.</div>`;
+  const prox=[];for(let i=1;i<=7;i++){const d=new Date();d.setDate(d.getDate()+i);const ds=d.toISOString().split('T')[0];R.filter(r=>r.ci===ds).forEach(r=>prox.push({...r,_l:d.toLocaleDateString('pt-BR',{weekday:'short',day:'numeric',month:'short'})}));}
+  document.getElementById('d-prox').innerHTML=prox.length?prox.map(r=>`<div class="dli"><div class="dld" style="background:var(--blue)"></div><div class="dlc"><div class="dln">${r.nome}</div><div class="dlm">${r.apt} · ${r._l}</div></div><span style="font-size:.72rem;color:var(--text3);">${nts(r.ci,r.co)}n</span></div>`).join(''):`<div style="font-size:.8rem;color:var(--text3);padding:.75rem 0">Nenhuma entrada nos próximos 7 dias.</div>`;
+  document.getElementById('d-occ').innerHTML=CFG.apts.map(apt=>{const res=R.find(r=>r.apt===apt&&r.ci<=t&&r.co>t);const isO=R.find(r=>r.apt===apt&&r.co===t);let cl='',lb='Disponível',gu='';if(isO){cl='co-day';lb='🔴 Check-out hoje';gu=isO.nome;}else if(res){cl='occ';lb='🟢 Ocupado';gu=res.nome;}return`<div class="oc ${cl}"><div class="oan">${apt}</div><div class="ost">${lb}</div>${gu?`<div class="ogu">${gu}</div>`:''}</div>`;}).join('');
+}
+
+// ══ TABLE ══
+function renderTable(){
+  const q=(document.getElementById('si')?.value||'').toLowerCase();
+  const fs=document.getElementById('ff-st')?.value||'';
+  const fa=document.getElementById('ff-ap')?.value||'';
+  const t=td();
+  let rows=R.filter(r=>{if(q&&!r.nome.toLowerCase().includes(q)&&!r.apt.toLowerCase().includes(q))return false;if(fs&&r.status!==fs)return false;if(fa&&r.apt!==fa)return false;return true;}).sort((a,b)=>b.ci.localeCompare(a.ci));
+  const tb=document.getElementById('tb'),te=document.getElementById('te');
+  if(!rows.length){tb.innerHTML='';te.style.display='';return;}
+  te.style.display='none';
+  tb.innerHTML=rows.map(r=>{const co=r.co===t,ac=r.status==='ativo',n=nts(r.ci,r.co);const gTotal=1+(r.guests||[]).length;const ciDone=r.checkinConfirmed;const docInfo=r.docNumero?`<div style="font-size:.7rem;color:var(--text3);margin-top:2px;">🪪 ${r.docTipo}: ${r.docNumero}</div>`:'';return`<tr class="${co?'rout':ac?'ract':''}"><td><div class="gn">${r.nome}</div><div class="gp">${r.tel}</div>${docInfo}</td><td><span class="ac">${r.apt}</span></td><td>${fmt(r.ci)}${r.ci===t?' <span style="font-size:.65rem;color:var(--blue);font-weight:700;margin-left:4px;">HOJE</span>':''}</td><td>${fmt(r.co)}${co?' <span style="font-size:.65rem;color:var(--coral);font-weight:700;margin-left:4px;">HOJE</span>':''}</td><td>${n} noite${n!==1?'s':''}</td><td><span style="font-size:.8rem;font-weight:600;color:${gTotal>1?'var(--accent2)':'var(--text3)'};">👥 ${gTotal}</span></td><td>R$ ${parseFloat(r.val||0).toLocaleString('pt-BR',{minimumFractionDigits:2})}</td><td><span class="badge ${bc(r,t)}"><span class="bdot" style="background:${bd(r,t)}"></span>${bl(r,t)}</span></td><td><div class="acts"><button class="ibtn" onclick="openWA('${r.id}')" title="WhatsApp">📱</button><button class="ibtn" title="${ciDone?'Check-in confirmado':r.ci>t?'Check-in só disponível em '+fmt(r.ci):'Confirmar Check-in'}" onclick="confirmCI('${r.id}')" style="${ciDone?'color:var(--green);border-color:rgba(74,222,128,.3);':r.ci>t?'opacity:.4;cursor:not-allowed;':''}" ${r.ci>t&&!ciDone?'disabled':''}>${ciDone?'✅':'🔑'}</button><button class="ibtn" onclick="openModal('${r.id}')" title="Editar">✏️</button><button class="ibtn" onclick="delRes('${r.id}')" title="Excluir">🗑️</button></div></td></tr>`;}).join('');
+}
+
+// ══ CALENDAR ══
+function renderCal(){
+  const mons=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+  document.getElementById('cal-lbl').textContent=`${mons[cM]} ${cY}`;
+  document.getElementById('cal-hdr').innerHTML=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'].map(d=>`<div class="cdl">${d}</div>`).join('');
+  const first=new Date(cY,cM,1).getDay(),last=new Date(cY,cM+1,0).getDate(),t=td();
+  let h='';
+  for(let i=0;i<first;i++){const pd=new Date(cY,cM,-first+i+1).getDate();h+=`<div class="cc other"><div class="cn">${pd}</div></div>`;}
+  for(let d=1;d<=last;d++){const ds=`${cY}-${String(cM+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;const iT=ds===t;const ev=R.filter(r=>r.ci===ds||r.co===ds||(r.ci<ds&&r.co>ds));const num=iT?`<div class="cn" style="display:flex;align-items:center;justify-content:center;width:20px;height:20px;background:var(--accent);color:#fff;border-radius:50%;font-size:.68rem;">${d}</div>`:`<div class="cn">${d}</div>`;h+=`<div class="cc${iT?' today':''}">${num}${ev.slice(0,3).map(r=>`<div class="ce ${r.ci===ds?'ei':r.co===ds?'eo':'es'}">${r.apt}</div>`).join('')}</div>`;}
+  const rem=42-first-last;for(let i=1;i<=rem;i++)h+=`<div class="cc other"><div class="cn">${i}</div></div>`;
+  document.getElementById('cal-body').innerHTML=h;
+}
+function chMon(d){cM+=d;if(cM>11){cM=0;cY++;}if(cM<0){cM=11;cY--;}renderCal();}
+
+// ══ APTS ══
+function renderApts(){
+  const t=td();
+  document.getElementById('apt-grid').innerHTML=CFG.apts.map(apt=>{const res=R.find(r=>r.apt===apt&&r.ci<=t&&r.co>t);const isO=R.find(r=>r.apt===apt&&r.co===t);const up=R.filter(r=>r.apt===apt&&r.ci>t).sort((a,b)=>a.ci.localeCompare(b.ci))[0];let cl='',lb='🟢 Disponível',inf='';if(isO){cl='co-day';lb='🔴 Check-out hoje';inf=`<div style="font-size:.78rem;margin-top:8px;"><strong>${isO.nome}</strong><br><span style="color:var(--text3)">Saída: ${CFG.time}</span></div>`;}else if(res){cl='occ';lb='🟡 Ocupado';inf=`<div style="font-size:.78rem;margin-top:8px;"><strong>${res.nome}</strong><br><span style="color:var(--text3)">Até: ${fmt(res.co)}</span></div>`;}else if(up){inf=`<div style="font-size:.72rem;color:var(--text3);margin-top:8px;">Próx: ${up.nome}<br>${fmt(up.ci)}</div>`;}return`<div class="oc ${cl}"><div class="oan" style="font-size:1.1rem;">${apt}</div><div class="ost" style="margin-top:4px;">${lb}</div>${inf}</div>`;}).join('');
+}
+
+// ══ CHECK-IN PAGE ══
+let ciTabState='pendente';
+function setCiTab(tab,el){ciTabState=tab;document.querySelectorAll('.ci-tab').forEach(t=>t.classList.remove('active'));el.classList.add('active');renderCiPage();}
+function renderCiPage(){
+  const t=td();
+  let rows=R.filter(r=>r.status!=='finalizado');
+  if(ciTabState==='pendente') rows=rows.filter(r=>!r.checkinConfirmed&&r.ci<=t);
+  else if(ciTabState==='hoje') rows=rows.filter(r=>r.ci===t);
+  else if(ciTabState==='confirmado') rows=rows.filter(r=>r.checkinConfirmed);
+  rows=rows.sort((a,b)=>a.ci.localeCompare(b.ci));
+  const grid=document.getElementById('ci-grid'),empty=document.getElementById('ci-empty');
+  if(!rows.length){grid.innerHTML='';empty.style.display='';return;}
+  empty.style.display='none';
+  grid.innerHTML=rows.map(r=>{
+    const guests=r.guests||[];const total=1+guests.length;const isToday=r.ci===t;const isDone=r.checkinConfirmed;
+    const cls=isDone?'done':isToday?'today-ci':'pending';
+    const guestTags=`<span class="gst-tag gst-host">👤 ${r.nome}</span>`+guests.map(g=>`<span class="gst-tag">👤 ${g}</span>`).join('');
+    return`<div class="ci-card ${cls}">
+      <div class="ci-top">
+        <div><div class="ci-apt">${r.apt}</div>${isToday?`<span style="font-size:.7rem;background:rgba(124,106,247,.2);color:var(--accent2);border-radius:20px;padding:2px 8px;font-weight:700;">CHEGANDO HOJE</span>`:''}</div>
+        <span class="badge ${bc(r,t)}"><span class="bdot" style="background:${bd(r,t)}"></span>${bl(r,t)}</span>
+      </div>
+      <div class="ci-name">${r.nome}</div><div class="ci-tel">${r.tel}</div>
+      ${r.docNumero?`<div style="font-size:.72rem;color:var(--text3);margin-top:2px;">🪪 ${r.docTipo}: ${r.docNumero}</div>`:''}
+      <div class="ci-dates">
+        <div class="ci-date-pill"><strong>${fmt(r.ci)}</strong>Check-in</div>
+        <div class="ci-date-pill"><strong>${fmt(r.co)}</strong>Check-out</div>
+        <div class="ci-date-pill"><strong>${nts(r.ci,r.co)} noites</strong>Estadia</div>
+      </div>
+      <div style="font-size:.7rem;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:.4rem;font-weight:600;">👥 ${total} hóspede${total!==1?'s':''}</div>
+      <div class="ci-guests">${guestTags}</div>
+      ${isDone?`<div style="font-size:.72rem;color:var(--green);margin-top:.5rem;">✅ Check-in realizado em ${fmt(r.checkinDate||r.ci)} às ${r.checkinTime||'--:--'}</div>`:''}
+      <div class="ci-actions">
+        <button class="ci-confirm-btn" onclick="confirmCI('${r.id}')" ${isDone||r.ci>t?'disabled':''} style="${r.ci>t?'background:var(--bg4);color:var(--text3);cursor:not-allowed;border:1px solid var(--border);box-shadow:none;':''}">
+          ${isDone?'✅ Check-in Realizado':r.ci>t?`🔒 Disponível em ${fmt(r.ci)}`:'🔑 Confirmar Check-in'}
+        </button>
+        <button class="ibtn" onclick="openWA('${r.id}')" title="WhatsApp" style="flex-shrink:0;">📱</button>
+        <button class="ibtn" onclick="openModal('${r.id}')" title="Editar" style="flex-shrink:0;">✏️</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function confirmCI(id){
+  const r=R.find(x=>x.id===id);if(!r)return;
+  const t=td();
+  // Bloquear check-in antecipado
+  if(!r.checkinConfirmed && r.ci > t){
+    toast(`⚠ Check-in não permitido! A reserva de ${r.nome} começa em ${fmt(r.ci)}.`,'error');
+    return;
+  }
+  if(r.checkinConfirmed){
+    if(!confirm('Desfazer confirmação de check-in?'))return;
+    r.checkinConfirmed=false;
+    r.checkinTime=null;
+    r.checkinDate=null;
+    if(r.status==='ativo')r.status='confirmado';
+  } else {
+    const agora=new Date();
+    r.checkinConfirmed=true;
+    r.checkinDate=td(); // data real do check-in
+    r.checkinTime=agora.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}); // hora real
+    if(r.status==='confirmado')r.status='ativo';
+  }
+  r.ts=Date.now();
+  isSaving=true;
+  syncStatus('syncing');
+  try{
+    const url=`${SB_URL}/rest/v1/reservas?id=eq.${id}`;
+    const headers={'apikey':SB_KEY,'Authorization':`Bearer ${SB_KEY}`,'Content-Type':'application/json','X-Client-Info':'metropolitan-flat/1.0','Prefer':'return=representation'};
+    const body={checkin_confirmed:r.checkinConfirmed,checkin_time:r.checkinTime,checkin_date:r.checkinDate,status:r.status,ts:r.ts};
+    const res=await fetch(url,{method:'PATCH',headers,body:JSON.stringify(body)});
+    if(!res.ok){const err=await res.text();throw new Error(err);}
+    localStorage.setItem('R',JSON.stringify(R));
+    syncStatus('ok');
+    renderAll();
+    toast(r.checkinConfirmed?`✅ Check-in de ${r.nome} confirmado em ${fmt(r.checkinDate)} às ${r.checkinTime}!`:'Check-in desfeito','success');
+  }catch(e){
+    console.error('Erro check-in:',e);
+    syncStatus('err');
+    toast('Erro ao salvar no banco: '+e.message,'error');
+  } finally {
+    isSaving=false;
+  }
+}
+
+// ══ BACKUP ══
+function renderBk(){
+  document.getElementById('bk-tot').textContent=R.length;
+  const sz=new Blob([JSON.stringify({R,CFG})]).size;
+  document.getElementById('bk-sz').textContent=sz>1024?(sz/1024).toFixed(1)+' KB':sz+' B';
+  const last=BKH[BKH.length-1];
+  document.getElementById('bk-last').textContent=last?last.date.split('T')[0].split('-').reverse().join('/'):'—';
+  const el=document.getElementById('bk-hist');
+  if(!BKH.length){el.innerHTML=`<div style="font-size:.8rem;color:var(--text3);padding:.75rem 0;">Nenhum backup realizado ainda.</div>`;return;}
+  el.innerHTML=[...BKH].reverse().map(b=>`<div class="hi"><div class="hi-ico" style="background:${b.type==='json'?'rgba(124,106,247,.15)':'rgba(45,212,176,.15)'};">${b.type==='json'?'📦':'📊'}</div><div class="hi-inf"><div class="hi-n">${b.name}</div><div class="hi-m">${new Date(b.date).toLocaleString('pt-BR')} · ${b.count} reservas</div></div><span style="font-size:.68rem;color:var(--text3);text-transform:uppercase;font-weight:600;">${b.type.toUpperCase()}</span></div>`).join('');
+}
+function exportJSON(){const data={version:'1.0',exported:new Date().toISOString(),R,CFG};const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const name=`metropolitan_flat_backup_${td()}.json`;dl(blob,name);addBkH({type:'json',name,count:R.length});toast('Backup JSON exportado!','success');}
+function exportCSV(){const head=['ID','Nome','Telefone','Apartamento','Check-in','Check-out','Diárias','Valor','Status','Hóspedes','Observações'];const rows=R.map(r=>[r.id,r.nome,r.tel,r.apt,r.ci,r.co,nts(r.ci,r.co),r.val,r.status,[r.nome,...(r.guests||[])].join(' | '),r.obs||''].map(v=>`"${String(v).replace(/"/g,'""')}"`).join(','));const csv=[head.join(','),...rows].join('\n');const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});const name=`metropolitan_flat_${td()}.csv`;dl(blob,name);addBkH({type:'csv',name,count:R.length});toast('Planilha CSV exportada!','success');}
+function dl(blob,name){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();}
+function addBkH(item){BKH.push({...item,date:new Date().toISOString()});if(BKH.length>20)BKH.shift();localStorage.setItem('BKH',JSON.stringify(BKH));renderBk();}
+function previewImport(e){const f=e.target.files[0];if(!f)return;const reader=new FileReader();reader.onload=ev=>{try{const data=JSON.parse(ev.target.result);if(!data.R)throw new Error();pImport=data;const rp=document.getElementById('rp');rp.style.display='block';rp.textContent=`Arquivo: ${f.name}\nReservas: ${data.R.length}\nApartamentos: ${data.CFG?.apts?.length||'?'}\n\nAmostra:\n${JSON.stringify(data.R.slice(0,2),null,2)}`;document.getElementById('imp-acts').style.display='flex';toast('Arquivo carregado. Confirme a importação.','warn');}catch{toast('Arquivo inválido.','error');}};reader.readAsText(f);}
+async function confirmImport(){
+  if(!pImport)return;
+  syncStatus('syncing');
+  try{
+    for(const r of pImport.R){ await sb.upsert('reservas', localToDB(r)); }
+    R=pImport.R;
+    if(pImport.CFG){CFG=pImport.CFG;await sb.saveCfg(CFG);}
+    localStorage.setItem('R',JSON.stringify(R));
+    document.getElementById('rp').style.display='none';
+    document.getElementById('imp-acts').style.display='none';
+    document.getElementById('imp-file').value='';
+    pImport=null;
+    syncStatus('ok');
+    loadCfgUI();renderAll();
+    toast(`${R.length} reservas importadas!`,'success');
+  }catch(e){syncStatus('err');toast('Erro ao importar para o banco.','error');}
+}
+function cancelImport(){pImport=null;document.getElementById('rp').style.display='none';document.getElementById('imp-acts').style.display='none';document.getElementById('imp-file').value='';}
+async function clearAll(){
+  if(!confirm(`⚠ Apagar TODAS as ${R.length} reservas? Esta ação não pode ser desfeita.`))return;
+  syncStatus('syncing');
+  try{
+    for(const r of R){ await sb.delete('reservas', r.id); }
+    R=[];localStorage.setItem('R','[]');
+    syncStatus('ok');renderAll();toast('Todos os dados foram removidos','error');
+  }catch(e){syncStatus('err');toast('Erro ao limpar no banco.','error');}
+}
+
+// ══ ALERTS ══
+function checkAlerts(){const t=td(),co=R.filter(r=>r.co===t);if(co.length&&CFG.notif){document.getElementById('alrt').style.display='';document.getElementById('alrt-msg').innerHTML=`<strong>${co.length}</strong> saída${co.length>1?'s':''} hoje: `+co.map(r=>`${r.nome} (${r.apt})`).join(', ')+` — Checkout: ${CFG.time}`;}}
+
+// ══ MODAL ══
+function openModal(id=null){
+  eid=id;document.getElementById('mo-t').textContent=id?'Editar Reserva':'Nova Reserva';document.getElementById('mo-btn').textContent=id?'Salvar Alterações':'Salvar Reserva';
+  clearF();
+  if(id){const r=R.find(x=>x.id===id);if(r){document.getElementById('f-nm').value=r.nome;document.getElementById('f-tl').value=r.tel;document.getElementById('f-ap').value=r.apt;document.getElementById('f-ci').value=r.ci;document.getElementById('f-co').value=r.co;document.getElementById('f-ci-hora').value=r.horaCi||'';document.getElementById('f-co-hora').value=r.horaCo||'';document.getElementById('f-vl').value=r.val;document.getElementById('f-st').value=r.status;document.getElementById('f-ob').value=r.obs||'';document.getElementById('f-doctp').value=r.docTipo||'CPF';document.getElementById('f-doc').value=r.docNumero||'';calcN();(r.guests||[]).forEach(g=>addGuestField(g));}}
+  document.getElementById('mo').classList.add('open');
+}
+function closeModal(){document.getElementById('mo').classList.remove('open');eid=null;}
+function clearF(){['f-nm','f-tl','f-ci','f-co','f-ci-hora','f-co-hora','f-vl','f-ob','f-doc'].forEach(id=>document.getElementById(id).value='');document.getElementById('f-ap').value='';document.getElementById('f-st').value='confirmado';document.getElementById('f-doctp').value='CPF';document.getElementById('dpill').style.display='none';['e-nm','e-tl','e-ap','e-ci','e-co','e-vl'].forEach(id=>document.getElementById(id).textContent='');document.getElementById('guests-list').innerHTML='';}
+function calcN(){const ci=document.getElementById('f-ci').value,co=document.getElementById('f-co').value,p=document.getElementById('dpill');if(ci&&co){const n=nts(ci,co);if(n===0){p.textContent='Reserva de mesmo dia (diária)';p.style.display='block';p.style.background='rgba(251,191,36,.12)';p.style.color='var(--gold)';}else if(n>0){p.textContent=`${n} noite${n!==1?'s':''} de estadia`;p.style.display='block';p.style.background='rgba(124,106,247,.12)';p.style.color='var(--accent2)';}else{p.textContent='A data de saída não pode ser antes da entrada';p.style.display='block';p.style.background='var(--coral-dim)';p.style.color='var(--coral)';}}else p.style.display='none';}
+function addGuestField(val=''){const id='g'+Date.now()+Math.random().toString(36).slice(2,5);const div=document.createElement('div');div.className='guest-row';div.id=id;div.innerHTML=`<input type="text" class="guest-inp" placeholder="Nome do acompanhante" value="${val}"><button type="button" class="rmg-btn" onclick="document.getElementById('${id}').remove()">✕</button>`;document.getElementById('guests-list').appendChild(div);}
+
+async function saveRes(){
+  const nome=document.getElementById('f-nm').value.trim(),tel=document.getElementById('f-tl').value.trim(),apt=document.getElementById('f-ap').value,ci=document.getElementById('f-ci').value,co=document.getElementById('f-co').value,val=document.getElementById('f-vl').value,status=document.getElementById('f-st').value,obs=document.getElementById('f-ob').value.trim();
+  let ok=true;
+  if(!nome){document.getElementById('e-nm').textContent='Obrigatório';ok=false;}else document.getElementById('e-nm').textContent='';
+  if(!tel){document.getElementById('e-tl').textContent='Obrigatório';ok=false;}else document.getElementById('e-tl').textContent='';
+  if(!apt){document.getElementById('e-ap').textContent='Selecione';ok=false;}else document.getElementById('e-ap').textContent='';
+  if(!ci){document.getElementById('e-ci').textContent='Obrigatório';ok=false;}else document.getElementById('e-ci').textContent='';
+  if(!co){document.getElementById('e-co').textContent='Obrigatório';ok=false;}else document.getElementById('e-co').textContent='';
+  if(!val){document.getElementById('e-vl').textContent='Obrigatório';ok=false;}else document.getElementById('e-vl').textContent='';
+  if(!ok)return;
+  if(ci>co){document.getElementById('e-co').textContent='Deve ser igual ou após o check-in';return;}
+  const conf=R.find(r=>{if(eid&&r.id===eid)return false;if(r.apt!==apt)return false;return!(co<=r.ci||ci>=r.co);});
+  if(conf){toast(`⚠ Conflito com reserva de ${conf.nome} (${fmt(conf.ci)} → ${fmt(conf.co)})`,'error');return;}
+  const guests=Array.from(document.querySelectorAll('.guest-inp')).map(i=>i.value.trim()).filter(Boolean);
+  const prev=eid?R.find(r=>r.id===eid):null;
+  const docTipo=document.getElementById('f-doctp').value;
+  const docNumero=document.getElementById('f-doc').value.trim();
+  const horaCi=document.getElementById('f-ci-hora').value;
+  const horaCo=document.getElementById('f-co-hora').value;
+  const res={id:eid||Date.now().toString(),nome,tel,apt,ci,co,val:parseFloat(val),status,obs,guests,docTipo,docNumero,horaCi,horaCo,checkinConfirmed:prev?.checkinConfirmed||false,checkinTime:prev?.checkinTime||null,earlyCheckout:prev?.earlyCheckout||false,earlyCheckoutDate:prev?.earlyCheckoutDate||null,earlyCheckoutTime:prev?.earlyCheckoutTime||null,ts:Date.now()};
+  if(eid){const i=R.findIndex(r=>r.id===eid);R[i]=res;}else{R.push(res);}
+  closeModal();
+  await saveToDb(res);
+  renderAll();
+  toast(eid?'Reserva atualizada!':'Reserva criada!','success');
+}
+
+async function delRes(id){
+  const r=R.find(x=>x.id===id);if(!confirm(`Excluir reserva de ${r?.nome}?`))return;
+  R=R.filter(x=>x.id!==id);
+  renderAll();
+  await deleteFromDb(id);
+  toast('Reserva excluída','warn');
+}
+
+// ══ WHATSAPP ══
+function openWA(id){const r=R.find(x=>x.id===id);if(!r)return;const msg=CFG.msg.replace('{nome}',r.nome).replace('{apartamento}',r.apt).replace('{horario}',CFG.time);waNum=r.tel.replace(/\D/g,'');if(!waNum.startsWith('55'))waNum='55'+waNum;waMsg=msg;document.getElementById('wa-txt').textContent=msg;document.getElementById('mo-wa').classList.add('open');}
+function doWA(){window.open(`https://wa.me/${waNum}?text=${encodeURIComponent(waMsg)}`);}
+
+// ══ CONFIG ══
+function loadCfgUI(){document.getElementById('cfg-t').value=CFG.time;document.getElementById('cfg-h').value=CFG.hours;document.getElementById('cfg-n').checked=CFG.notif;document.getElementById('cfg-msg').value=CFG.msg;renderTags();fillSels();}
+async function saveConfig(){
+  CFG.time=document.getElementById('cfg-t').value;CFG.hours=parseInt(document.getElementById('cfg-h').value);CFG.notif=document.getElementById('cfg-n').checked;CFG.msg=document.getElementById('cfg-msg').value;
+  try{
+    await sb.saveCfg(CFG);
+    localStorage.setItem('CFG',JSON.stringify(CFG));
+    toast('Configurações salvas!','success');
+  }catch{
+    localStorage.setItem('CFG',JSON.stringify(CFG));
+    toast('Salvo localmente (sem conexão)','warn');
+  }
+  renderAll();
+}
+async function addApt(){
+  const v=document.getElementById('napt').value.trim();
+  if(!v)return;
+  if(CFG.apts.includes(v)){toast('Já cadastrado','warn');return;}
+  CFG.apts.push(v);
+  document.getElementById('napt').value='';
+  renderTags();fillSels();
+  try{await sb.saveCfg(CFG);toast(`${v} adicionado e salvo!`,'success');}
+  catch{localStorage.setItem('CFG',JSON.stringify(CFG));toast(`${v} adicionado (salvo localmente)`,'warn');}
+}
+async function rmApt(a){
+  if(!confirm(`Remover ${a}?`))return;
+  CFG.apts=CFG.apts.filter(x=>x!==a);
+  renderTags();fillSels();
+  try{await sb.saveCfg(CFG);toast(`${a} removido!`,'warn');}
+  catch{localStorage.setItem('CFG',JSON.stringify(CFG));}
+}
+function renderTags(){document.getElementById('atags').innerHTML=CFG.apts.map(a=>`<span class="atag">${a}<button onclick="rmApt('${a}')">✕</button></span>`).join('');}
+function fillSels(){const o=CFG.apts.map(a=>`<option value="${a}">${a}</option>`).join('');document.getElementById('f-ap').innerHTML=`<option value="">Selecione…</option>`+o;const fa=document.getElementById('ff-ap');if(fa)fa.innerHTML=`<option value="">Todos os apts.</option>`+o;const ra=document.getElementById('rel-apt');if(ra)ra.innerHTML=`<option value="">Todos</option>`+o;}
+
+// ══ RELATÓRIOS ══
+function initRel(){
+  const t=td();
+  document.getElementById('rel-di').value=t;
+  document.getElementById('rel-df').value=t;
+  renderRel();
+}
+function renderRel(){
+  const tipo=document.getElementById('rel-tipo').value;
+  const di=document.getElementById('rel-di').value;
+  const df=document.getElementById('rel-df').value||di;
+  const apt=document.getElementById('rel-apt').value;
+  // Mostrar/ocultar data final
+  document.getElementById('rel-df-wrap').style.display=(tipo==='dia')?'none':'flex';
+  let rows=R.filter(r=>{if(apt&&r.apt!==apt)return false;return true;});
+  if(tipo==='dia'){
+    rows=rows.filter(r=>r.ci===di||r.co===di||(r.ci<di&&r.co>di));
+  } else if(tipo==='checkin'){
+    rows=rows.filter(r=>r.ci>=di&&r.ci<=df);
+  } else if(tipo==='checkout'){
+    rows=rows.filter(r=>r.co>=di&&r.co<=df);
+  } else if(tipo==='periodo'||tipo==='financeiro'){
+    rows=rows.filter(r=>r.ci<=df&&r.co>=di);
+  }
+  rows=rows.sort((a,b)=>a.ci.localeCompare(b.ci));
+  // Summary
+  const fat=rows.reduce((s,r)=>s+(parseFloat(r.val)||0),0);
+  const sumEl=document.getElementById('rel-summary');
+  sumEl.innerHTML=`
+    <div class="rel-sum-card"><div class="rel-sum-val" style="color:var(--accent2)">${rows.length}</div><div class="rel-sum-lbl">Reservas</div></div>
+    <div class="rel-sum-card"><div class="rel-sum-val" style="color:var(--teal)">R$${fat.toLocaleString('pt-BR',{minimumFractionDigits:2})}</div><div class="rel-sum-lbl">Total</div></div>
+    <div class="rel-sum-card"><div class="rel-sum-val" style="color:var(--blue)">${rows.filter(r=>r.ci===di||r.ci>=di&&r.ci<=df).length}</div><div class="rel-sum-lbl">Check-ins</div></div>
+    <div class="rel-sum-card"><div class="rel-sum-val" style="color:var(--coral)">${rows.filter(r=>r.co===di||r.co>=di&&r.co<=df).length}</div><div class="rel-sum-lbl">Check-outs</div></div>
+  `;
+  // Título para impressão
+  const tpLabel={'dia':'Movimentação do Dia','checkin':'Check-ins','checkout':'Check-outs','periodo':'Reservas do Período','financeiro':'Relatório Financeiro'};
+  const dateRange=tipo==='dia'?`${fmt(di)}`:`${fmt(di)} a ${fmt(df)}`;
+  document.getElementById('print-subtitle').textContent=`${tpLabel[tipo]} — ${dateRange}${apt?' — '+apt:''}  |  Gerado em: ${new Date().toLocaleString('pt-BR')}`;
+  // Content
+  const el=document.getElementById('rel-content');
+  if(!rows.length){el.innerHTML=`<div class="empty"><div class="eico">📋</div><h3>Nenhum resultado</h3><p>Tente ajustar os filtros ou o período.</p></div>`;return;}
+  // Separar por check-in e check-out para relatório do dia
+  if(tipo==='dia'){
+    const checkins=rows.filter(r=>r.ci===di);
+    const emEstadia=rows.filter(r=>r.ci<di&&r.co>di);
+    const checkouts=rows.filter(r=>r.co===di);
+    el.innerHTML=
+      (checkins.length?`<div class="rel-section"><div class="rel-section-title" style="color:var(--blue);">🔵 Check-ins <span>${checkins.length}</span></div><div class="rel-card">${relHeader()}${checkins.map(r=>relRow(r,'ci')).join('')}</div></div>`:'') +
+      (checkouts.length?`<div class="rel-section"><div class="rel-section-title" style="color:var(--coral);">🔴 Check-outs <span>${checkouts.length}</span></div><div class="rel-card">${relHeader()}${checkouts.map(r=>relRow(r,'co')).join('')}</div></div>`:'') +
+      (emEstadia.length?`<div class="rel-section"><div class="rel-section-title" style="color:var(--green);">🟢 Em Estadia <span>${emEstadia.length}</span></div><div class="rel-card">${relHeader()}${emEstadia.map(r=>relRow(r,'')).join('')}</div></div>`:'');
+  } else {
+    el.innerHTML=`<div class="rel-section"><div class="rel-card">${relHeader()}${rows.map(r=>relRow(r,'')).join('')}</div></div>`;
+  }
+}
+function relHeader(){
+  return`<div class="rel-row header">
+    <div class="rel-cell">Hóspede</div>
+    <div class="rel-cell">Apartamento</div>
+    <div class="rel-cell">Check-in</div>
+    <div class="rel-cell">Check-out</div>
+    <div class="rel-cell">Valor</div>
+    <div class="rel-cell">Status</div>
+  </div>`;
+}
+function relRow(r,destaque){
+  const t=td();
+  const horaCiTxt=r.horaCi?` <span style="color:var(--accent2);font-weight:600;">${r.horaCi}</span>`:'';
+  const horaCoTxt=r.horaCo?` <span style="color:var(--coral);font-weight:600;">${r.horaCo}</span>`:'';
+  const docTxt=r.docNumero?`<div style="font-size:.68rem;color:var(--text3);">🪪 ${r.docTipo}: ${r.docNumero}</div>`:'';
+  const guestCount=1+(r.guests||[]).length;
+  return`<div class="rel-row">
+    <div class="rel-cell"><div style="font-weight:600;">${r.nome}</div><div style="font-size:.72rem;color:var(--text3);">${r.tel}</div>${docTxt}</div>
+    <div class="rel-cell"><span class="ac">${r.apt}</span>${guestCount>1?`<div style="font-size:.7rem;color:var(--text3);margin-top:3px;">👥 ${guestCount} hóspedes</div>`:''}</div>
+    <div class="rel-cell">${fmt(r.ci)}${horaCiTxt}${r.checkinConfirmed?`<div style="font-size:.68rem;color:var(--green);">✅ Realizado: ${fmt(r.checkinDate||r.ci)} ${r.checkinTime||''}</div>`:''}</div>
+    <div class="rel-cell">${fmt(r.co)}${horaCoTxt}${r.earlyCheckout?`<div style="font-size:.68rem;color:var(--teal);">🚪 Saída: ${r.earlyCheckoutDate||''} ${r.earlyCheckoutTime||''}</div>`:''}</div>
+    <div class="rel-cell" style="font-weight:600;">R$ ${parseFloat(r.val||0).toLocaleString('pt-BR',{minimumFractionDigits:2})}</div>
+    <div class="rel-cell"><span class="badge ${bc(r,t)}">${bl(r,t)}</span></div>
+  </div>`;
+}
+function printRel(){
+  renderRel();
+  setTimeout(()=>window.print(),300);
+}
+
+// ══ CHECKOUT ANTECIPADO ══
+function renderCoPage(){
+  const t=td();
+  // Inclui: ativas com checkout hoje, futuro OU atrasadas (checkout no passado)
+  let rows=R.filter(r=>r.status==='ativo'||(r.status==='confirmado'&&r.co<=t)).sort((a,b)=>a.co.localeCompare(b.co));
+  const grid=document.getElementById('coa-grid');
+  const empty=document.getElementById('coa-empty');
+  if(!rows.length){grid.innerHTML='';empty.style.display='';return;}
+  empty.style.display='none';
+  grid.innerHTML=rows.map(r=>{
+    const isDone=r.earlyCheckout;
+    const mesmoDia=r.ci===r.co;
+    const coHoje=r.co===t;
+    const atrasado=r.co<t;
+    const diasRestantes=nts(t,r.co);
+    const diasAtraso=nts(r.co,t);
+    const guests=r.guests||[];
+    const total=1+guests.length;
+    let statusLabel, statusColor, statusBg;
+    if(isDone){statusLabel='✅ Saída registrada';statusColor='var(--green)';statusBg='rgba(74,222,128,.1)';}
+    else if(atrasado){statusLabel=`⚠ Atrasado ${diasAtraso} dia${diasAtraso!==1?'s':''}`;statusColor='var(--gold)';statusBg='rgba(251,191,36,.15)';}
+    else if(coHoje){statusLabel='🔴 Checkout hoje';statusColor='var(--coral)';statusBg='rgba(248,113,113,.15)';}
+    else{statusLabel='🏠 Em estadia';statusColor='var(--green)';statusBg='rgba(74,222,128,.1)';}
+    return`<div class="coa-card${isDone?' done':''}${atrasado&&!isDone?' ':''}">
+      <div class="coa-top">
+        <div>
+          <div class="coa-apt">${r.apt}</div>
+          <span style="font-size:.7rem;background:${statusBg};color:${statusColor};border-radius:20px;padding:2px 8px;font-weight:700;">${statusLabel}</span>
+        </div>
+        <span class="badge ${atrasado&&!isDone?'b-out':'b-act'}"><span class="bdot" style="background:${atrasado&&!isDone?'var(--coral)':'var(--green)'}"></span>${atrasado&&!isDone?'Atrasado':'Ativo'}</span>
+      </div>
+      <div class="coa-name">${r.nome}</div>
+      <div class="coa-tel">${r.tel} · 👥 ${total} hóspede${total!==1?'s':''}</div>
+      <div class="coa-dates">
+        <div class="coa-pill"><strong>${fmt(r.ci)}</strong>Check-in</div>
+        <div class="coa-pill${coHoje||atrasado?' highlight':''}"><strong>${fmt(r.co)}</strong>Checkout previsto</div>
+        <div class="coa-pill${atrasado?' ':''}"><strong>${mesmoDia?'Mesmo dia':atrasado?diasAtraso+' dia'+(diasAtraso!==1?'s':'')+' atraso':diasRestantes+' dia'+(diasRestantes!==1?'s':'')+' restante'+(diasRestantes!==1?'s':'')}</strong>${atrasado?'Atraso':'Duração'}</div>
+      </div>
+      ${isDone?`<div style="font-size:.72rem;color:var(--green);margin:.5rem 0;">✅ Saída registrada em ${r.earlyCheckoutDate} às ${r.earlyCheckoutTime}</div>`:''}
+      ${atrasado&&!isDone?`<div style="font-size:.72rem;color:var(--gold);background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.2);border-radius:6px;padding:6px 10px;margin:.5rem 0;">⚠ Checkout previsto para ${fmt(r.co)} não foi realizado. Registre a saída agora.</div>`:''}
+      <div class="coa-actions">
+        <button class="coa-btn" onclick="doEarlyCheckout('${r.id}')" ${isDone?'disabled':''} style="${atrasado&&!isDone?'background:linear-gradient(135deg,var(--gold),#d4a01a);color:#1a1200;':coHoje?'':''}">
+          ${isDone?'✅ Saída Registrada':atrasado?'⚠ Registrar Saída Atrasada':coHoje?'🚪 Registrar Saída':'🚪 Registrar Saída Antecipada'}
+        </button>
+        <button class="ibtn" onclick="openWA('${r.id}')" title="WhatsApp" style="flex-shrink:0;">📱</button>
+        <button class="ibtn" onclick="openModal('${r.id}')" title="Editar" style="flex-shrink:0;">✏️</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function doEarlyCheckout(id){
+  const r=R.find(x=>x.id===id);if(!r)return;
+  const agora=new Date();
+  const dataHoje=td();
+  const hora=agora.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+  if(!confirm(`Registrar saída antecipada de ${r.nome} (${r.apt})?\n\nData original: ${fmt(r.co)}\nSaída agora: ${fmt(dataHoje)} às ${hora}\n\nIsso vai finalizar a reserva e liberar o apartamento.`))return;
+  
+  // Atualiza localmente primeiro
+  r.earlyCheckout = true;
+  r.earlyCheckoutDate = fmt(dataHoje);
+  r.earlyCheckoutTime = hora;
+  r.co = dataHoje;
+  r.status = 'finalizado';
+  r.ts = Date.now();
+
+  isSaving = true;
+  syncStatus('syncing');
+  
+  try{
+    // Força update direto via PATCH
+    const url = `${SB_URL}/rest/v1/reservas?id=eq.${id}`;
+    const headers = {
+      'apikey': SB_KEY,
+      'Authorization': `Bearer ${SB_KEY}`,
+      'Content-Type': 'application/json',
+      'X-Client-Info': 'metropolitan-flat/1.0',
+      'Prefer': 'return=representation'
+    };
+    const body = {
+      co: dataHoje,
+      status: 'finalizado',
+      early_checkout: true,
+      early_checkout_date: fmt(dataHoje),
+      early_checkout_time: hora,
+      ts: r.ts
+    };
+    const res = await fetch(url, {method:'PATCH', headers, body: JSON.stringify(body)});
+    if(!res.ok){ const err=await res.text(); throw new Error(err); }
+    localStorage.setItem('R', JSON.stringify(R));
+    syncStatus('ok');
+    renderAll();
+    toast(`🚪 Saída de ${r.nome} registrada!`,'success');
+  }catch(e){
+    console.error('Erro checkout antecipado:', e);
+    syncStatus('err');
+    toast('Erro ao salvar no banco: '+e.message,'error');
+  } finally {
+    isSaving = false;
+  }
+}
+
+// ══ HELPERS ══
+function td(){return new Date().toISOString().split('T')[0];}
+function nts(ci,co){return Math.round((new Date(co+'T12:00')-new Date(ci+'T12:00'))/86400000);}
+function fmt(s){if(!s)return'—';const[y,m,d]=s.split('-');return`${d}/${m}/${y}`;}
+function bc(r,t){if(r.co===t)return'b-out';if(r.status==='ativo')return'b-act';if(r.status==='confirmado')return'b-conf';return'b-fin';}
+function bl(r,t){if(r.co===t)return'Saída Hoje';if(r.status==='ativo')return'Em andamento';if(r.status==='confirmado')return'Aguardando Check-in';return'Finalizado';}
+function bd(r,t){if(r.co===t)return'var(--coral)';if(r.status==='ativo')return'var(--green)';if(r.status==='confirmado')return'var(--blue)';return'var(--text3)';}
+function tick(){document.getElementById('clock').textContent=new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});}
+function toast(msg,type=''){const el=document.createElement('div');el.className=`toast ${type}`;el.textContent=msg;document.getElementById('tw').appendChild(el);setTimeout(()=>{el.style.opacity='0';el.style.transform='translateX(100%)';el.style.transition='all .3s';},2700);setTimeout(()=>el.remove(),3100);}
+
+// Iniciar
+document.getElementById('copy-year').textContent=new Date().getFullYear();
+boot();
+</script>
+</body>
+</html>
