@@ -1041,7 +1041,7 @@ async function saveRes(){
   if(!co){document.getElementById('e-co').textContent='Obrigatório';ok=false;}else document.getElementById('e-co').textContent='';
   if(!ok)return;
   if(ci>co){document.getElementById('e-co').textContent='Deve ser igual ou após o check-in';return;}
-  const conf=R.find(r=>{if(eid&&r.id===eid)return false;if(r.apt!==apt)return false;return!(co<=r.ci||ci>=r.co);});
+  const conf=R.find(r=>{if(eid&&r.id===eid)return false;if(r.apt!==apt)return false;return!(co<=r.ci||ci>=r.co||ci===r.co);});
   if(conf){toast(`⚠ Conflito com reserva de ${conf.nome} (${fmt(conf.ci)} → ${fmt(conf.co)})`,'error');return;}
   const guests=Array.from(document.querySelectorAll('.guest-inp')).map(i=>i.value.trim()).filter(Boolean);
   const prev=eid?R.find(r=>r.id===eid):null;
